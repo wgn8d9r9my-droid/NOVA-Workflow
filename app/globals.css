@@ -100,20 +100,9 @@
   --radius-float: 1.75rem; /* 28px — floating/glass surfaces */
 
   /* Glass surfaces */
-  --glass-bg: rgba(255, 255, 255, 0.58);
-  --glass-border: rgba(255, 255, 255, 0.55);
-  --glass-blur: 24px;
-
-  /* Ambient atmosphere — a premium, cinematic backdrop (warm light + soft
-     greenery) rendered behind the whole shell so glass surfaces have
-     something alive to frost over, instead of a flat fill. */
-  --atmosphere-base: linear-gradient(165deg, #fbf6ee 0%, #f4f1ea 45%, #edf0f3 100%);
-  --atmosphere-sun: #ffd9a3;
-  --atmosphere-sun-opacity: 0.65;
-  --atmosphere-plant: #7c9473;
-  --atmosphere-plant-opacity: 0.55;
-  --atmosphere-vignette: rgba(30, 26, 16, 0.05);
-  --atmosphere-grain-opacity: 0.25;
+  --glass-bg: rgba(255, 255, 255, 0.68);
+  --glass-border: rgba(255, 255, 255, 0.5);
+  --glass-blur: 20px;
 
   --sidebar: rgba(255, 255, 255, 0.7);
   --sidebar-foreground: #1a1d21;
@@ -169,17 +158,9 @@
   --chart-4: #2e5cb8;
   --chart-5: #1c2f6b;
 
-  --glass-bg: rgba(20, 22, 26, 0.46);
-  --glass-border: rgba(255, 255, 255, 0.09);
-  --glass-blur: 24px;
-
-  --atmosphere-base: linear-gradient(165deg, #0d0e11 0%, #0a0b0d 50%, #08090b 100%);
-  --atmosphere-sun: #ffb970;
-  --atmosphere-sun-opacity: 0.28;
-  --atmosphere-plant: #274436;
-  --atmosphere-plant-opacity: 0.65;
-  --atmosphere-vignette: rgba(0, 0, 0, 0.6);
-  --atmosphere-grain-opacity: 0.4;
+  --glass-bg: rgba(20, 22, 26, 0.55);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-blur: 20px;
 
   --sidebar: rgba(18, 20, 24, 0.6);
   --sidebar-foreground: #f2f3f5;
@@ -287,92 +268,6 @@
     }
     50% {
       box-shadow: 0 0 0 8px rgba(119, 147, 237, 0), 0 0 32px 10px rgba(119, 147, 237, 0.45);
-    }
-  }
-
-  /* Ambient, cinematic backdrop rendered once behind the whole shell — warm
-     light + soft greenery for glass surfaces to frost over. Pure CSS so it
-     never depends on external imagery. */
-  .atmosphere {
-    position: fixed;
-    inset: 0;
-    /* Negative (not 0) so it stacks behind every normal-flow page element,
-       including plain, non-positioned cards (Settings, Business, Finances…)
-       — z-index:0 would still paint above unpositioned static content. */
-    z-index: -1;
-    overflow: hidden;
-    pointer-events: none;
-    background: var(--atmosphere-base);
-  }
-  .atmosphere::after {
-    opacity: var(--atmosphere-grain-opacity);
-  }
-  .atmosphere-sun {
-    position: absolute;
-    top: -22%;
-    right: -12%;
-    width: 62vw;
-    height: 62vw;
-    max-width: 900px;
-    max-height: 900px;
-    border-radius: 50%;
-    background: radial-gradient(circle, var(--atmosphere-sun) 0%, transparent 68%);
-    opacity: var(--atmosphere-sun-opacity);
-    filter: blur(10px);
-    animation: atmosphere-drift 26s ease-in-out infinite;
-  }
-  .atmosphere-plant {
-    position: absolute;
-    background: var(--atmosphere-plant);
-    opacity: var(--atmosphere-plant-opacity);
-    filter: blur(50px);
-  }
-  .atmosphere-plant-1 {
-    left: -12vw;
-    bottom: -6vw;
-    width: 40vw;
-    height: 40vw;
-    border-radius: 42% 58% 63% 37% / 41% 44% 56% 59%;
-    animation: atmosphere-sway 34s ease-in-out infinite;
-  }
-  .atmosphere-plant-2 {
-    left: -2vw;
-    bottom: 2vh;
-    width: 20vw;
-    height: 24vw;
-    border-radius: 60% 40% 55% 45% / 45% 55% 40% 60%;
-    animation: atmosphere-sway 28s ease-in-out infinite reverse;
-  }
-  .atmosphere-plant-3 {
-    right: 8vw;
-    top: 4vh;
-    width: 14vw;
-    height: 16vw;
-    border-radius: 55% 45% 40% 60% / 60% 40% 60% 40%;
-    opacity: calc(var(--atmosphere-plant-opacity) * 0.7);
-    animation: atmosphere-sway 30s ease-in-out infinite;
-  }
-  .atmosphere-vignette {
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(130% 100% at 50% 15%, transparent 35%, var(--atmosphere-vignette) 100%);
-  }
-  @keyframes atmosphere-drift {
-    0%,
-    100% {
-      transform: translate(0, 0) scale(1);
-    }
-    50% {
-      transform: translate(-3%, 2%) scale(1.05);
-    }
-  }
-  @keyframes atmosphere-sway {
-    0%,
-    100% {
-      transform: translate(0, 0) scale(1);
-    }
-    50% {
-      transform: translate(2%, -2%) scale(1.03);
     }
   }
 }
