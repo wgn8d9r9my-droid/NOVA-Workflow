@@ -1,14 +1,18 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
-import { Check, Sun, Moon, Laptop, Trash2 } from "lucide-react";
+import { Check, Sun, Moon, Laptop, Trash2, LogOut } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { usePreferencesStore } from "@/lib/store/preferences";
 import { accentColors } from "@/lib/accent-colors";
+import { createClient } from "@/lib/supabase/client";
+import { supabaseConfigured } from "@/lib/supabase/is-configured";
+import { useSupabaseUser } from "@/hooks/use-supabase-user";
 import type { Density } from "@/types/entities";
 
 const THEME_OPTIONS = [
@@ -30,10 +34,18 @@ function SettingsSection({ title, description, children }: { title: string; desc
 }
 
 export default function SettingsPage() {
+  const router = useRouter();
   const { theme, setTheme } = useTheme();
   const preferences = usePreferencesStore((s) => s.preferences);
   const setPreferences = usePreferencesStore((s) => s.setPreferences);
+  const { user } = useSupabaseUser();
   const [confirmReset, setConfirmReset] = useState(false);
+
+  async function signOut() {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    router.replace("/login");
+  }
 
   function resetLocalData() {
     if (!confirmReset) {
@@ -125,7 +137,23 @@ export default function SettingsPage() {
         </div>
       </SettingsSection>
 
-      <SettingsSection title="Données" description="NOVA fonctionne en local pour le moment — connecte Supabase plus tard pour synchroniser dans le cloud.">
+      {supabaseConfigured && user && (
+        <SettingsSection title="Compte" description={user.email}>
+          <Button variant="outline" size="sm" className="gap-1.5" onClick={signOut}>
+            <LogOut className="size-3.5" />
+            Se déconnecter
+          </Button>
+        </SettingsSection>
+      )}
+
+      <SettingsSection
+        title="Données"
+        description={
+          supabaseConfigured
+            ? "Tes données sont synchronisées dans le cloud."
+            : "NOVA fonctionne en local pour le moment — connecte Supabase pour synchroniser dans le cloud."
+        }
+      >
         <Button
           variant={confirmReset ? "destructive" : "outline"}
           size="sm"
