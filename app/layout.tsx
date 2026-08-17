@@ -18,6 +18,11 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "NOVA — Ton espace numérique personnel",
   description: "Life OS personnel : projets, objectifs, finances, habitudes et créativité, réunis dans un seul espace.",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "NOVA",
+  },
 };
 
 export const viewport: Viewport = {
