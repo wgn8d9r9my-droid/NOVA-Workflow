@@ -122,7 +122,9 @@ export default function CalendarPage() {
       {view === "week" && (
         <WeekView date={selectedDate} onSelectDay={selectDay} onOpenTask={setSelectedTaskId} />
       )}
-      {view === "month" && <MonthView date={selectedDate} onSelectDay={selectDay} />}
+      {view === "month" && (
+        <MonthView date={selectedDate} onSelectDay={selectDay} onOpenTask={setSelectedTaskId} />
+      )}
 
       {unplanned.length > 0 && (
         <div>
