@@ -176,6 +176,69 @@
   --shadow-glow: 0 0 0 1px rgba(119, 147, 237, 0.2), 0 8px 30px rgba(119, 147, 237, 0.16);
 }
 
+/* "Ambiance" — a third, always-dark cinematic theme styled directly after a
+   moody creative-studio photo: warm window light top-right, soft plants
+   bottom-left, deep vignette. Shares dark mode's color tokens; the glass
+   surfaces just get more translucent so the backdrop actually shows through. */
+.ambiance {
+  --background: #0b0d10;
+  --foreground: #f2f3f5;
+  --card: #141619;
+  --card-foreground: #f2f3f5;
+  --popover: #14161a;
+  --popover-foreground: #f2f3f5;
+
+  --primary: #7793ed;
+  --primary-foreground: #0b0d10;
+  --glow: #a9bbf5;
+
+  --secondary: #1c1f24;
+  --secondary-foreground: #f2f3f5;
+  --muted: #1c1f24;
+  --muted-foreground: #9aa1ac;
+  --accent: #182140;
+  --accent-foreground: #a9bbf5;
+
+  --destructive: #ff6369;
+  --positive: #37c26a;
+  --negative: #ff6369;
+
+  --border: rgba(255, 255, 255, 0.08);
+  --input: rgba(255, 255, 255, 0.12);
+  --ring: #7793ed;
+
+  --chart-1: #7793ed;
+  --chart-2: #a9bbf5;
+  --chart-3: #4a6cc4;
+  --chart-4: #2e5cb8;
+  --chart-5: #1c2f6b;
+
+  --glass-bg: rgba(20, 22, 26, 0.46);
+  --glass-border: rgba(255, 255, 255, 0.09);
+  --glass-blur: 24px;
+
+  --sidebar: rgba(18, 20, 24, 0.5);
+  --sidebar-foreground: #f2f3f5;
+  --sidebar-primary: #7793ed;
+  --sidebar-primary-foreground: #0b0d10;
+  --sidebar-accent: #182140;
+  --sidebar-accent-foreground: #a9bbf5;
+  --sidebar-border: rgba(255, 255, 255, 0.06);
+  --sidebar-ring: #7793ed;
+
+  --shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.2), 0 8px 24px rgba(0, 0, 0, 0.28);
+  --shadow-float: 0 8px 20px rgba(0, 0, 0, 0.3), 0 24px 60px rgba(0, 0, 0, 0.45);
+  --shadow-glow: 0 0 0 1px rgba(119, 147, 237, 0.2), 0 8px 30px rgba(119, 147, 237, 0.16);
+
+  --atmosphere-base: linear-gradient(165deg, #0d0e11 0%, #0a0b0d 50%, #08090b 100%);
+  --atmosphere-sun: #ffb970;
+  --atmosphere-sun-opacity: 0.4;
+  --atmosphere-plant: #33553f;
+  --atmosphere-plant-opacity: 0.65;
+  --atmosphere-vignette: rgba(0, 0, 0, 0.6);
+  --atmosphere-grain-opacity: 0.4;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -268,6 +331,89 @@
     }
     50% {
       box-shadow: 0 0 0 8px rgba(119, 147, 237, 0), 0 0 32px 10px rgba(119, 147, 237, 0.45);
+    }
+  }
+
+  /* Ambiance theme's backdrop — warm light + soft greenery, styled after a
+     moody creative-studio photo. Only ever mounted while the "ambiance"
+     theme is active, so it never affects light/dark. */
+  .atmosphere {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    overflow: hidden;
+    pointer-events: none;
+    background: var(--atmosphere-base);
+  }
+  .atmosphere::after {
+    opacity: var(--atmosphere-grain-opacity);
+  }
+  .atmosphere-sun {
+    position: absolute;
+    top: -22%;
+    right: -12%;
+    width: 62vw;
+    height: 62vw;
+    max-width: 900px;
+    max-height: 900px;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--atmosphere-sun) 0%, transparent 68%);
+    opacity: var(--atmosphere-sun-opacity);
+    filter: blur(10px);
+    animation: atmosphere-drift 26s ease-in-out infinite;
+  }
+  .atmosphere-plant {
+    position: absolute;
+    background: var(--atmosphere-plant);
+    opacity: var(--atmosphere-plant-opacity);
+    filter: blur(50px);
+  }
+  .atmosphere-plant-1 {
+    left: -12vw;
+    bottom: -6vw;
+    width: 40vw;
+    height: 40vw;
+    border-radius: 42% 58% 63% 37% / 41% 44% 56% 59%;
+    animation: atmosphere-sway 34s ease-in-out infinite;
+  }
+  .atmosphere-plant-2 {
+    left: -2vw;
+    bottom: 2vh;
+    width: 20vw;
+    height: 24vw;
+    border-radius: 60% 40% 55% 45% / 45% 55% 40% 60%;
+    animation: atmosphere-sway 28s ease-in-out infinite reverse;
+  }
+  .atmosphere-plant-3 {
+    right: 8vw;
+    top: 4vh;
+    width: 14vw;
+    height: 16vw;
+    border-radius: 55% 45% 40% 60% / 60% 40% 60% 40%;
+    opacity: calc(var(--atmosphere-plant-opacity) * 0.7);
+    animation: atmosphere-sway 30s ease-in-out infinite;
+  }
+  .atmosphere-vignette {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(130% 100% at 50% 15%, transparent 35%, var(--atmosphere-vignette) 100%);
+  }
+  @keyframes atmosphere-drift {
+    0%,
+    100% {
+      transform: translate(0, 0) scale(1);
+    }
+    50% {
+      transform: translate(-3%, 2%) scale(1.05);
+    }
+  }
+  @keyframes atmosphere-sway {
+    0%,
+    100% {
+      transform: translate(0, 0) scale(1);
+    }
+    50% {
+      transform: translate(2%, -2%) scale(1.03);
     }
   }
 }

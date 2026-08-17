@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Settings, Plus, Search, ChevronRight, Sun, Moon } from "lucide-react";
+import { Settings, Plus, Search, ChevronRight, Sun, Moon, Sparkles } from "lucide-react";
 import { motion } from "motion/react";
 import { useTheme } from "next-themes";
 import { cn } from "@/lib/utils";
@@ -19,9 +19,16 @@ export function Sidebar({
 }) {
   const pathname = usePathname();
   const firstName = usePreferencesStore((s) => s.preferences.first_name);
-  const { resolvedTheme, setTheme } = useTheme();
+  const { theme, resolvedTheme, setTheme } = useTheme();
 
   const initial = firstName?.trim()?.[0]?.toUpperCase() || "N";
+  const currentTheme = theme === "system" ? resolvedTheme : theme;
+  function cycleTheme() {
+    if (currentTheme === "light") setTheme("dark");
+    else if (currentTheme === "dark") setTheme("ambiance");
+    else setTheme("light");
+  }
+  const ThemeIcon = currentTheme === "dark" ? Moon : currentTheme === "ambiance" ? Sparkles : Sun;
 
   return (
     <aside className="fixed inset-y-0 left-0 z-40 hidden w-[92px] flex-col px-3 py-6 lg:flex xl:w-[276px] xl:px-4">
@@ -134,11 +141,11 @@ export function Sidebar({
 
           <div className="mt-2 flex items-center gap-2">
             <button
-              onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
+              onClick={cycleTheme}
               className="flex size-9 shrink-0 items-center justify-center rounded-xl border border-border/60 bg-background/40 text-foreground/70 transition-colors hover:bg-black/[0.03] dark:hover:bg-white/[0.05]"
               aria-label="Changer de thème"
             >
-              {resolvedTheme === "dark" ? <Moon className="size-4" /> : <Sun className="size-4" />}
+              <ThemeIcon className="size-4" />
             </button>
 
             <Link

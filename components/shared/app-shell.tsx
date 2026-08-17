@@ -2,6 +2,8 @@
 
 import { useEffect, useState, type ReactNode } from "react";
 import { useRouter, usePathname } from "next/navigation";
+import { useTheme } from "next-themes";
+import { Atmosphere } from "@/components/shared/atmosphere";
 import { Sidebar } from "@/components/shared/sidebar";
 import { MobileNav } from "@/components/shared/mobile-nav";
 import { Topbar } from "@/components/shared/topbar";
@@ -19,6 +21,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const hydrated = useHydrated();
   const router = useRouter();
   const pathname = usePathname();
+  const { theme } = useTheme();
   const onboardingDone = usePreferencesStore((s) => s.preferences.onboarding_done);
   const { user, checked } = useSupabaseUser();
   const [prefsHydrated, setPrefsHydrated] = useState(!supabaseConfigured);
@@ -81,13 +84,15 @@ export function AppShell({ children }: { children: ReactNode }) {
     return (
       <>
         {supabaseConfigured && user && <DataSync />}
-        <div className="min-h-screen bg-background" />
+        {theme === "ambiance" && <Atmosphere />}
+        <div className="min-h-screen" />
       </>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen">
+      {theme === "ambiance" && <Atmosphere />}
       <DataSync />
       <ApplyPreferences />
       <Sidebar onQuickCapture={() => openCapture()} onSearch={() => setPaletteOpen(true)} />
