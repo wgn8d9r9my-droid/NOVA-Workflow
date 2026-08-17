@@ -1,4 +1,6 @@
 import { WidgetCard } from "@/components/home/widget-card";
+import { useTaskCategoriesStore } from "@/lib/store/task-categories";
+import { formatTimeRange } from "@/lib/calendar-derived";
 import type { Task } from "@/types/entities";
 
 const PALETTE = ["#104090", "#7793ed", "#2e5cb8", "#a9bbf5", "#4a6cc4"];
@@ -19,6 +21,10 @@ export function AgendaCard({
   projectName: (id?: string) => string | undefined;
   projectColor: (id?: string) => string | undefined;
 }) {
+  const categories = useTaskCategoriesStore((s) => s.items);
+  function categoryColor(id?: string) {
+    return id ? categories.find((c) => c.id === id)?.color : undefined;
+  }
   return (
     <WidgetCard
       title="Agenda du jour"

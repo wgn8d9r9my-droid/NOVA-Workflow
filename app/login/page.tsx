@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { createClient } from "@/lib/supabase/client";
 import { supabaseConfigured } from "@/lib/supabase/is-configured";
+import { Logo } from "@/components/shared/logo";
 
 export default function LoginPage() {
   return (
@@ -46,9 +47,7 @@ function LoginForm() {
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="glass shadow-float w-full max-w-md rounded-4xl p-8">
         <div className="mb-8 flex items-center gap-2">
-          <span className="flex size-8 items-center justify-center rounded-full bg-primary text-sm font-semibold text-primary-foreground">
-            N
-          </span>
+          <Logo size={32} />
           <span className="text-sm font-medium text-muted-foreground">NOVA</span>
         </div>
 

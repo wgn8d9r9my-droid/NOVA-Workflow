@@ -5,9 +5,24 @@ import { ChevronDown } from "lucide-react";
 import { QuickAddTask } from "@/components/calendar/quick-add-task";
 import { TaskRow } from "@/components/shared/task-row";
 import { useTasksStore } from "@/lib/store/tasks";
-import { useProjectsStore } from "@/lib/store/projects";
-import { tasksForDate, splitByTime, HOURS, formatTimeRange } from "@/lib/calendar-derived";
+import { useTaskCategoriesStore } from "@/lib/store/task-categories";
+import {
+  tasksForDate,
+  splitByTime,
+  layoutDayTasks,
+  formatTimeRange,
+  HOURS,
+  HOUR_HEIGHT_PX,
+  DAY_GRID_HEIGHT_PX,
+} from "@/lib/calendar-derived";
 import { cn } from "@/lib/utils";
+import type { Priority } from "@/types/entities";
+
+const PRIORITY_COLOR: Record<Priority, string> = {
+  P1: "var(--primary)",
+  P2: "var(--glow)",
+  P3: "var(--muted-foreground)",
+};
 
 export function DayView({
   date,
@@ -18,13 +33,14 @@ export function DayView({
 }) {
   const tasks = useTasksStore((s) => s.items);
   const updateTask = useTasksStore((s) => s.update);
-  const projects = useProjectsStore((s) => s.items);
+  const categories = useTaskCategoriesStore((s) => s.items);
   const [showCompleted, setShowCompleted] = useState(false);
 
   const dayTasks = useMemo(() => tasksForDate(tasks, date), [tasks, date]);
   const open = useMemo(() => dayTasks.filter((t) => t.status === "todo"), [dayTasks]);
   const completed = useMemo(() => dayTasks.filter((t) => t.status === "done"), [dayTasks]);
-  const { allDay, byHour } = useMemo(() => splitByTime(open), [open]);
+  const { allDay, timed } = useMemo(() => splitByTime(open), [open]);
+  const layout = useMemo(() => layoutDayTasks(timed), [timed]);
 
   function toggleTask(id: string) {
     const task = tasks.find((t) => t.id === id);
@@ -35,8 +51,8 @@ export function DayView({
     });
   }
 
-  function projectName(id?: string) {
-    return id ? projects.find((p) => p.id === id)?.name : undefined;
+  function categoryFor(id?: string) {
+    return id ? categories.find((c) => c.id === id) : undefined;
   }
 
   return (
@@ -48,46 +64,72 @@ export function DayView({
           <p className="mb-1.5 px-1 text-xs font-medium text-muted-foreground">Toute la journée</p>
           <div className="glass shadow-soft flex flex-col rounded-2xl p-2">
             {allDay.map((task) => (
-              <TaskRow
-                key={task.id}
-                task={task}
-                onToggle={toggleTask}
-                onOpen={onOpenTask}
-                subtitle={projectName(task.project_id)}
-              />
+              <TaskRow key={task.id} task={task} onToggle={toggleTask} onOpen={onOpenTask} />
             ))}
           </div>
         </div>
       )}
 
       <div className="glass shadow-soft rounded-2xl p-2">
-        {HOURS.map((hour) => {
-          const hourTasks = byHour.get(hour) ?? [];
-          return (
-            <div key={hour} className="flex gap-3 border-t border-border/50 py-1.5 first:border-t-0">
-              <span className="w-12 shrink-0 pt-1.5 text-right text-xs tabular-nums text-muted-foreground">
-                {String(hour).padStart(2, "0")}:00
-              </span>
-              <div className="flex-1">
-                {hourTasks.length === 0 ? (
-                  <div className="h-7" />
-                ) : (
-                  <div className="flex flex-col">
-                    {hourTasks.map((task) => (
-                      <TaskRow
-                        key={task.id}
-                        task={task}
-                        onToggle={toggleTask}
-                        onOpen={onOpenTask}
-                        subtitle={formatTimeRange(task.due_time, task.duration_minutes)}
-                      />
-                    ))}
-                  </div>
-                )}
+        <div className="flex">
+          <div className="w-12 shrink-0" style={{ height: DAY_GRID_HEIGHT_PX }}>
+            {HOURS.map((hour) => (
+              <div key={hour} className="text-right text-xs tabular-nums text-muted-foreground" style={{ height: HOUR_HEIGHT_PX }}>
+                <span className="relative -top-1.5 pr-1.5">{String(hour).padStart(2, "0")}:00</span>
               </div>
-            </div>
-          );
-        })}
+            ))}
+          </div>
+
+          <div className="relative flex-1" style={{ height: DAY_GRID_HEIGHT_PX }}>
+            {HOURS.map((hour, i) => (
+              <div
+                key={hour}
+                className="absolute inset-x-0 border-t border-border/50 first:border-t-0"
+                style={{ top: i * HOUR_HEIGHT_PX }}
+              />
+            ))}
+
+            {layout.map(({ task, top, height, left, width, isRange }) => {
+              const category = categoryFor(task.category_id);
+              const color = category?.color ?? PRIORITY_COLOR[task.priority];
+              return (
+                <button
+                  key={task.id}
+                  onClick={() => onOpenTask(task.id)}
+                  style={{
+                    top,
+                    height,
+                    left: `calc(${left}% + 2px)`,
+                    width: `calc(${width}% - 6px)`,
+                    background: isRange ? color : undefined,
+                  }}
+                  className={cn(
+                    "group absolute overflow-hidden rounded-lg text-left transition-opacity hover:opacity-90",
+                    isRange
+                      ? "flex flex-col justify-start px-2 py-1 text-[11px] text-white shadow-soft"
+                      : "flex items-center gap-1.5 px-1.5 text-[11px] hover:bg-black/[0.03] dark:hover:bg-white/[0.05]"
+                  )}
+                >
+                  {isRange ? (
+                    <>
+                      <span className="truncate font-medium leading-tight">{task.title}</span>
+                      <span className="truncate text-[10px] leading-tight opacity-80">
+                        {formatTimeRange(task.due_time, task.end_time)}
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      <span className="size-2 shrink-0 rounded-full" style={{ background: color }} />
+                      <span className="truncate text-foreground">
+                        <span className="tabular-nums text-muted-foreground">{task.due_time}</span> {task.title}
+                      </span>
+                    </>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </div>
       </div>
 
       {completed.length > 0 && (

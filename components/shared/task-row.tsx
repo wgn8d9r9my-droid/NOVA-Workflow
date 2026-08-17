@@ -3,6 +3,7 @@
 import { motion } from "motion/react";
 import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useTaskCategoriesStore } from "@/lib/store/task-categories";
 import type { Task } from "@/types/entities";
 
 const priorityStyles: Record<Task["priority"], string> = {
@@ -23,6 +24,9 @@ export function TaskRow({
   subtitle?: string;
 }) {
   const done = task.status === "done";
+  const category = useTaskCategoriesStore((s) =>
+    task.category_id ? s.items.find((c) => c.id === task.category_id) : undefined
+  );
 
   return (
     <div
@@ -52,6 +56,8 @@ export function TaskRow({
           </motion.div>
         )}
       </button>
+
+      {category && <span className="size-1.5 shrink-0 rounded-full" style={{ background: category.color }} />}
 
       <span
         className={cn(

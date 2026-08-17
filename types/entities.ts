@@ -9,14 +9,23 @@ export interface Task {
   priority: Priority;
   status: TaskStatus;
   due_date?: string; // ISO date (yyyy-mm-dd)
-  due_time?: string; // HH:mm, 24h
-  duration_minutes?: number;
+  due_time?: string; // HH:mm, 24h — start time
+  end_time?: string; // HH:mm, 24h — set only for a ranged event
+  category_id?: string;
   project_id?: string;
   goal_id?: string;
   tags: string[];
   created_at: string;
   updated_at: string;
   completed_at?: string;
+}
+
+export interface TaskCategory {
+  id: string;
+  name: string;
+  color: string;
+  created_at: string;
+  updated_at: string;
 }
 
 export type ProjectStatus =

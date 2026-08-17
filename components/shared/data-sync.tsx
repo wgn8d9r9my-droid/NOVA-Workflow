@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/client";
 import { supabaseConfigured } from "@/lib/supabase/is-configured";
 import { useSupabaseUser } from "@/hooks/use-supabase-user";
 import { useTasksStore } from "@/lib/store/tasks";
+import { useTaskCategoriesStore } from "@/lib/store/task-categories";
 import { useProjectsStore, useProjectFoldersStore } from "@/lib/store/projects";
 import { useGoalsStore, useMilestonesStore } from "@/lib/store/goals";
 import { useNotesStore } from "@/lib/store/notes";
@@ -14,6 +15,7 @@ import { useJournalStore } from "@/lib/store/journal";
 
 const ENTITY_STORES = [
   { table: "tasks", store: useTasksStore },
+  { table: "task_categories", store: useTaskCategoriesStore },
   { table: "projects", store: useProjectsStore },
   { table: "project_folders", store: useProjectFoldersStore },
   { table: "goals", store: useGoalsStore },

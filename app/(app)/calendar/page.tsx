@@ -12,6 +12,7 @@ import { DayView } from "@/components/calendar/day-view";
 import { WeekView } from "@/components/calendar/week-view";
 import { MonthView } from "@/components/calendar/month-view";
 import { TaskEditorSheet } from "@/components/calendar/task-editor-sheet";
+import { CategoryManager } from "@/components/calendar/category-manager";
 import { TaskRow } from "@/components/shared/task-row";
 import { useTasksStore } from "@/lib/store/tasks";
 import { useProjectsStore } from "@/lib/store/projects";
@@ -76,6 +77,8 @@ export default function CalendarPage() {
         </div>
 
         <div className="flex items-center gap-3">
+          <CategoryManager />
+
           <Tabs value={view} onValueChange={(v) => setView(v as ViewMode)}>
             <TabsList>
               <TabsTrigger value="day">Jour</TabsTrigger>

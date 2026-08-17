@@ -5,7 +5,8 @@ import { format, isToday } from "date-fns";
 import { fr } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import { useTasksStore } from "@/lib/store/tasks";
-import { weekDays, tasksForDate } from "@/lib/calendar-derived";
+import { useTaskCategoriesStore } from "@/lib/store/task-categories";
+import { weekDays, tasksForDate, formatTimeRange } from "@/lib/calendar-derived";
 import { priorityDotClass } from "@/lib/priority";
 
 export function WeekView({
@@ -18,7 +19,12 @@ export function WeekView({
   onOpenTask: (id: string) => void;
 }) {
   const tasks = useTasksStore((s) => s.items);
+  const categories = useTaskCategoriesStore((s) => s.items);
   const days = useMemo(() => weekDays(date), [date]);
+
+  function categoryColor(id?: string) {
+    return id ? categories.find((c) => c.id === id)?.color : undefined;
+  }
 
   return (
     <div className="grid grid-cols-7 gap-2">
@@ -44,22 +50,30 @@ export function WeekView({
               {dayTasks.length === 0 ? (
                 <span className="px-1 pt-2 text-center text-[11px] text-muted-foreground/60">—</span>
               ) : (
-                dayTasks.slice(0, 6).map((task) => (
-                  <button
-                    key={task.id}
-                    onClick={() => onOpenTask(task.id)}
-                    className={cn(
-                      "flex items-center gap-1 rounded-lg px-1.5 py-1 text-left text-[11px] hover:bg-muted",
-                      task.status === "done" && "opacity-40 line-through"
-                    )}
-                  >
-                    <span className={cn("size-1.5 shrink-0 rounded-full", priorityDotClass[task.priority])} />
-                    <span className="truncate">
-                      {task.due_time && <span className="text-muted-foreground">{task.due_time} </span>}
-                      {task.title}
-                    </span>
-                  </button>
-                ))
+                dayTasks.slice(0, 6).map((task) => {
+                  const color = categoryColor(task.category_id);
+                  return (
+                    <button
+                      key={task.id}
+                      onClick={() => onOpenTask(task.id)}
+                      className={cn(
+                        "flex items-center gap-1 rounded-lg px-1.5 py-1 text-left text-[11px] hover:bg-muted",
+                        task.status === "done" && "opacity-40 line-through"
+                      )}
+                    >
+                      <span
+                        className={cn("size-1.5 shrink-0 rounded-full", !color && priorityDotClass[task.priority])}
+                        style={color ? { background: color } : undefined}
+                      />
+                      <span className="truncate">
+                        {task.due_time && (
+                          <span className="text-muted-foreground">{formatTimeRange(task.due_time, task.end_time)} </span>
+                        )}
+                        {task.title}
+                      </span>
+                    </button>
+                  );
+                })
               )}
               {dayTasks.length > 6 && (
                 <button

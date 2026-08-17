@@ -158,8 +158,8 @@
   --chart-4: #2e5cb8;
   --chart-5: #1c2f6b;
 
-  --glass-bg: rgba(20, 22, 26, 0.55);
-  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-bg: rgba(52, 56, 63, 0.5);
+  --glass-border: rgba(255, 255, 255, 0.12);
   --glass-blur: 20px;
 
   --sidebar: rgba(18, 20, 24, 0.6);
@@ -213,8 +213,8 @@
   --chart-4: #2e5cb8;
   --chart-5: #1c2f6b;
 
-  --glass-bg: rgba(20, 22, 26, 0.46);
-  --glass-border: rgba(255, 255, 255, 0.09);
+  --glass-bg: rgba(56, 60, 67, 0.42);
+  --glass-border: rgba(255, 255, 255, 0.13);
   --glass-blur: 24px;
 
   --sidebar: rgba(18, 20, 24, 0.5);
@@ -250,8 +250,8 @@
   .glass {
     background: var(--glass-bg);
     border: 1px solid var(--glass-border);
-    backdrop-filter: blur(var(--glass-blur)) saturate(1.4);
-    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.4);
+    backdrop-filter: blur(var(--glass-blur)) saturate(1.4) brightness(1.12);
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.4) brightness(1.12);
   }
   .shadow-soft {
     box-shadow: var(--shadow-soft);

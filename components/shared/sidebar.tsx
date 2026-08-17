@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 import { navItems } from "@/lib/nav-items";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { usePreferencesStore } from "@/lib/store/preferences";
+import { Logo } from "@/components/shared/logo";
 
 export function Sidebar({
   onQuickCapture,
@@ -37,9 +38,7 @@ export function Sidebar({
         <div className="pointer-events-none absolute -right-16 bottom-12 size-48 rounded-full bg-glow/10 blur-3xl" />
 
         <Link href="/" className="relative z-10 mb-5 flex items-center gap-2.5 px-1 pt-1">
-          <span className="orb-glow flex size-9 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-glow text-sm font-bold text-primary-foreground">
-            N
-          </span>
+          <Logo size={36} className="orb-glow" />
           <div className="hidden xl:block">
             <p className="text-[15px] font-semibold leading-tight tracking-tight">Nova</p>
             <p className="text-[10px] font-medium uppercase tracking-[0.16em] text-muted-foreground">

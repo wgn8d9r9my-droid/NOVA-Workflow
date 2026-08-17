@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { usePreferencesStore } from "@/lib/store/preferences";
 import { useHydrated } from "@/lib/store/use-hydrated";
+import { Logo } from "@/components/shared/logo";
 
 const AREAS = [
   "Business & création",
@@ -48,9 +49,7 @@ export default function OnboardingPage() {
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="glass shadow-float w-full max-w-md rounded-4xl p-8">
         <div className="mb-8 flex items-center gap-2">
-          <span className="flex size-8 items-center justify-center rounded-full bg-primary text-sm font-semibold text-primary-foreground">
-            N
-          </span>
+          <Logo size={32} />
           <span className="text-sm font-medium text-muted-foreground">Bienvenue dans NOVA</span>
         </div>
 
