@@ -268,48 +268,63 @@ alter table public.events enable row level security;
 alter table public.notifications enable row level security;
 alter table public.ai_actions_log enable row level security;
 
+drop policy if exists "own row" on public.user_preferences;
 create policy "own row" on public.user_preferences
   for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 
+drop policy if exists "own rows" on public.goals;
 create policy "own rows" on public.goals
   for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 
+drop policy if exists "own rows" on public.milestones;
 create policy "own rows" on public.milestones
   for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 
+drop policy if exists "own rows" on public.clients;
 create policy "own rows" on public.clients
   for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 
+drop policy if exists "own rows" on public.project_folders;
 create policy "own rows" on public.project_folders
   for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 
+drop policy if exists "own rows" on public.projects;
 create policy "own rows" on public.projects
   for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 
+drop policy if exists "own rows" on public.tasks;
 create policy "own rows" on public.tasks
   for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 
+drop policy if exists "own rows" on public.notes;
 create policy "own rows" on public.notes
   for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 
+drop policy if exists "own rows" on public.journal_entries;
 create policy "own rows" on public.journal_entries
   for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 
+drop policy if exists "own rows" on public.transactions;
 create policy "own rows" on public.transactions
   for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 
+drop policy if exists "own rows" on public.habits;
 create policy "own rows" on public.habits
   for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 
+drop policy if exists "own rows" on public.habit_entries;
 create policy "own rows" on public.habit_entries
   for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 
+drop policy if exists "own rows" on public.events;
 create policy "own rows" on public.events
   for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 
+drop policy if exists "own rows" on public.notifications;
 create policy "own rows" on public.notifications
   for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 
+drop policy if exists "own rows" on public.ai_actions_log;
 create policy "own rows" on public.ai_actions_log
   for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 
@@ -327,6 +342,7 @@ begin
 end;
 $$;
 
+drop trigger if exists on_auth_user_created on auth.users;
 create trigger on_auth_user_created
   after insert on auth.users
   for each row execute function public.handle_new_user();
