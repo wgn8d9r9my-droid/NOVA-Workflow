@@ -10,6 +10,7 @@ export interface Task {
   status: TaskStatus;
   due_date?: string; // ISO date (yyyy-mm-dd)
   due_time?: string; // HH:mm, 24h
+  duration_minutes?: number;
   project_id?: string;
   goal_id?: string;
   tags: string[];

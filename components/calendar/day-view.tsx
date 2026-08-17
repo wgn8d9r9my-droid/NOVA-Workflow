@@ -6,7 +6,7 @@ import { QuickAddTask } from "@/components/calendar/quick-add-task";
 import { TaskRow } from "@/components/shared/task-row";
 import { useTasksStore } from "@/lib/store/tasks";
 import { useProjectsStore } from "@/lib/store/projects";
-import { tasksForDate, splitByTime, HOURS } from "@/lib/calendar-derived";
+import { tasksForDate, splitByTime, HOURS, formatTimeRange } from "@/lib/calendar-derived";
 import { cn } from "@/lib/utils";
 
 export function DayView({
@@ -79,7 +79,7 @@ export function DayView({
                         task={task}
                         onToggle={toggleTask}
                         onOpen={onOpenTask}
-                        subtitle={task.due_time}
+                        subtitle={formatTimeRange(task.due_time, task.duration_minutes)}
                       />
                     ))}
                   </div>

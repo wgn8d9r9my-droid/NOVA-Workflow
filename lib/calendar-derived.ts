@@ -38,6 +38,24 @@ export function monthGrid(date: Date): Date[] {
   return days;
 }
 
+/** "90" → "1h30", "45" → "45 min", "120" → "2h". */
+export function formatDuration(minutes: number): string {
+  if (minutes < 60) return `${minutes} min`;
+  const h = Math.floor(minutes / 60);
+  const m = minutes % 60;
+  return m ? `${h}h${m}` : `${h}h`;
+}
+
+/** "14:00" or, with a duration, "14:00–14:45". */
+export function formatTimeRange(due_time?: string, duration_minutes?: number): string | undefined {
+  if (!due_time) return undefined;
+  if (!duration_minutes) return due_time;
+  const [h, m] = due_time.split(":").map(Number);
+  const end = new Date(2000, 0, 1, h, m + duration_minutes);
+  const endLabel = `${String(end.getHours()).padStart(2, "0")}:${String(end.getMinutes()).padStart(2, "0")}`;
+  return `${due_time}–${endLabel}`;
+}
+
 export function splitByTime(tasks: Task[]) {
   const allDay = tasks.filter((t) => !t.due_time);
   const byHour = new Map<number, Task[]>();

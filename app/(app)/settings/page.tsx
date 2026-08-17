@@ -90,7 +90,7 @@ export default function SettingsPage() {
       </SettingsSection>
 
       <SettingsSection title="Couleur d'accent">
-        <div className="flex gap-2.5">
+        <div className="flex flex-wrap gap-2.5">
           {accentColors.map((c) => (
             <button
               key={c.value}

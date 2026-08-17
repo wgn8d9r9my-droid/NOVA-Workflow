@@ -107,6 +107,7 @@ create table if not exists public.tasks (
   status text not null default 'todo' check (status in ('todo', 'done')),
   due_date date,
   due_time time,
+  duration_minutes integer,
   project_id uuid references public.projects (id) on delete set null,
   goal_id uuid references public.goals (id) on delete set null,
   tags text[] not null default '{}',

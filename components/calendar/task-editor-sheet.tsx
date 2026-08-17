@@ -24,7 +24,10 @@ import {
 import { cn } from "@/lib/utils";
 import { useTasksStore } from "@/lib/store/tasks";
 import { useProjectsStore } from "@/lib/store/projects";
+import { formatDuration } from "@/lib/calendar-derived";
 import type { Priority, Task } from "@/types/entities";
+
+const DURATIONS = [15, 30, 45, 60, 90, 120, 180];
 
 export function TaskEditorSheet({
   taskId,
@@ -124,12 +127,37 @@ function TaskEditorForm({ task, onDeleted }: { task: Task; onDeleted: () => void
                 <Button
                   variant="ghost"
                   size="icon-sm"
-                  onClick={() => updateTask(task.id, { due_date: undefined, due_time: undefined })}
+                  onClick={() =>
+                    updateTask(task.id, { due_date: undefined, due_time: undefined, duration_minutes: undefined })
+                  }
                 >
                   <X className="size-3.5" />
                 </Button>
               )}
             </div>
+
+            {task.due_time && (
+              <div className="mt-2 flex flex-wrap gap-1.5">
+                {DURATIONS.map((d) => (
+                  <button
+                    key={d}
+                    onClick={() =>
+                      updateTask(task.id, {
+                        duration_minutes: task.duration_minutes === d ? undefined : d,
+                      })
+                    }
+                    className={cn(
+                      "rounded-full border px-2.5 py-1 text-[11px] font-medium transition-colors",
+                      task.duration_minutes === d
+                        ? "border-primary bg-primary text-primary-foreground"
+                        : "border-border/60 text-muted-foreground hover:bg-muted"
+                    )}
+                  >
+                    {formatDuration(d)}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           <div>
