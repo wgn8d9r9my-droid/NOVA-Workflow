@@ -2,6 +2,7 @@
 
 import { useEffect, useState, type ReactNode } from "react";
 import { useRouter, usePathname } from "next/navigation";
+import { Atmosphere } from "@/components/shared/atmosphere";
 import { Sidebar } from "@/components/shared/sidebar";
 import { MobileNav } from "@/components/shared/mobile-nav";
 import { Topbar } from "@/components/shared/topbar";
@@ -81,13 +82,15 @@ export function AppShell({ children }: { children: ReactNode }) {
     return (
       <>
         {supabaseConfigured && user && <DataSync />}
-        <div className="min-h-screen bg-background" />
+        <Atmosphere />
+        <div className="min-h-screen" />
       </>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen">
+      <Atmosphere />
       <DataSync />
       <ApplyPreferences />
       <Sidebar onQuickCapture={() => openCapture()} onSearch={() => setPaletteOpen(true)} />
