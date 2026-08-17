@@ -36,7 +36,7 @@ function LoginForm() {
     });
     setLoading(false);
     if (error) {
-      setError("Impossible d'envoyer le lien. Vérifie l'adresse et réessaie.");
+      setError(`${error.message} (${error.status ?? "?"})`);
       return;
     }
     setSent(true);
