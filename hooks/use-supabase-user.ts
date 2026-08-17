@@ -20,7 +20,21 @@ export function useSupabaseUser() {
       setUser(session?.user ?? null);
     });
 
-    return () => listener.subscription.unsubscribe();
+    // Browsers throttle timers in background/inactive tabs, so the SDK's
+    // scheduled token refresh can be missed if the tab sits idle for hours.
+    // Force a refresh check the moment the tab regains focus, before that
+    // staleness has a chance to look like a real logout.
+    function onVisibilityChange() {
+      if (document.visibilityState === "visible") {
+        supabase.auth.getSession();
+      }
+    }
+    document.addEventListener("visibilitychange", onVisibilityChange);
+
+    return () => {
+      listener.subscription.unsubscribe();
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+    };
   }, []);
 
   return { user, checked };
