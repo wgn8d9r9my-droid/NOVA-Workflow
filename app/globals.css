@@ -231,8 +231,7 @@
   --shadow-glow: 0 0 0 1px rgba(119, 147, 237, 0.2), 0 8px 30px rgba(119, 147, 237, 0.16);
 
   --atmosphere-base: linear-gradient(165deg, #0d0e11 0%, #0a0b0d 50%, #08090b 100%);
-  --atmosphere-plant: #33553f;
-  --atmosphere-grain-opacity: 0.4;
+  --atmosphere-grain-opacity: 0.35;
 }
 
 @layer base {
@@ -330,10 +329,9 @@
     }
   }
 
-  /* Ambiance theme's backdrop — an illustrated creative-studio scene (plant,
-     camera, framed posters, warm window light, wood desk). Only ever
-     mounted while the "ambiance" theme is active, so it never touches
-     light/dark. */
+  /* Ambiance theme's backdrop — a real reference photo, softened and
+     scrimmed for legibility. Only ever mounted while the "ambiance" theme
+     is active, so it never touches light/dark. */
   .atmosphere {
     position: fixed;
     inset: 0;
@@ -345,11 +343,24 @@
   .atmosphere::after {
     opacity: var(--atmosphere-grain-opacity);
   }
-  .atmosphere-scene {
+  .atmosphere-photo {
+    position: absolute;
+    inset: -12px;
+    background-image: url("/ambiance-bg.jpg");
+    background-size: cover;
+    background-position: center 42%;
+    filter: blur(3px) saturate(1.05);
+    transform: scale(1.03);
+  }
+  .atmosphere-scrim {
     position: absolute;
     inset: 0;
-    width: 100%;
-    height: 100%;
+    background: linear-gradient(120deg, rgba(6, 7, 9, 0.78) 0%, rgba(6, 7, 9, 0.5) 45%, rgba(6, 7, 9, 0.75) 100%);
+  }
+  .atmosphere-vignette {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(130% 100% at 50% 20%, transparent 30%, rgba(0, 0, 0, 0.65) 100%);
   }
 }
 
