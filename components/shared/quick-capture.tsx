@@ -17,8 +17,7 @@ import { useTasksStore } from "@/lib/store/tasks";
 import { useNotesStore } from "@/lib/store/notes";
 import { useProjectsStore } from "@/lib/store/projects";
 import type { Priority } from "@/types/entities";
-
-type CaptureType = "task" | "note" | "idea" | "project" | "expense" | "journal";
+import type { CaptureType } from "@/lib/store/ui";
 
 const types: { id: CaptureType; label: string; icon: typeof CheckSquare; ready: boolean }[] = [
   { id: "task", label: "Tâche", icon: CheckSquare, ready: true },
@@ -29,17 +28,33 @@ const types: { id: CaptureType; label: string; icon: typeof CheckSquare; ready: 
   { id: "journal", label: "Journal", icon: BookOpen, ready: false },
 ];
 
-export function QuickCapture({ open, onOpenChange }: { open: boolean; onOpenChange: (v: boolean) => void }) {
-  const [type, setType] = useState<CaptureType | null>(null);
+export function QuickCapture({
+  open,
+  onOpenChange,
+  initialType,
+}: {
+  open: boolean;
+  onOpenChange: (v: boolean) => void;
+  initialType?: CaptureType;
+}) {
+  const [type, setType] = useState<CaptureType | null>(initialType ?? null);
   const [value, setValue] = useState("");
   const [priority, setPriority] = useState<Priority>("P2");
+
+  // Re-sync the selected type from `initialType` each time the sheet opens
+  // (adjusting state during render rather than in an effect).
+  const [prevOpen, setPrevOpen] = useState(open);
+  if (open !== prevOpen) {
+    setPrevOpen(open);
+    if (open) setType(initialType ?? null);
+  }
 
   const addTask = useTasksStore((s) => s.add);
   const addNote = useNotesStore((s) => s.add);
   const addProject = useProjectsStore((s) => s.add);
 
   function reset() {
-    setType(null);
+    setType(initialType ?? null);
     setValue("");
     setPriority("P2");
   }

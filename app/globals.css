@@ -207,6 +207,69 @@
   .ease-spring {
     transition-timing-function: var(--motion-ease-spring);
   }
+
+  /* Subtle film-grain overlay for cover/hero surfaces. */
+  .grain {
+    position: relative;
+    isolation: isolate;
+  }
+  .grain::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    opacity: 0.5;
+    mix-blend-mode: overlay;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E");
+  }
+
+  /* Photographic-style cover gradients — used where the reference design
+     uses stock photography, so thumbnails/cards feel art-directed without
+     depending on external images. */
+  .cover-mesh-1 {
+    background: radial-gradient(120% 140% at 15% 10%, #2e5cb8 0%, transparent 55%),
+      radial-gradient(100% 120% at 90% 90%, #0b0d10 0%, transparent 60%),
+      linear-gradient(160deg, #10254f 0%, #0b0d10 100%);
+  }
+  .cover-mesh-2 {
+    background: radial-gradient(110% 130% at 85% 15%, #7793ed 0%, transparent 55%),
+      radial-gradient(100% 120% at 10% 95%, #0b0d10 0%, transparent 60%),
+      linear-gradient(150deg, #1c2f6b 0%, #0b0d10 100%);
+  }
+  .cover-mesh-3 {
+    background: radial-gradient(120% 130% at 20% 90%, #a9bbf5 0%, transparent 50%),
+      radial-gradient(100% 110% at 90% 10%, #104090 0%, transparent 60%),
+      linear-gradient(155deg, #0f1b3d 0%, #0b0d10 100%);
+  }
+  .cover-mesh-4 {
+    background: radial-gradient(120% 140% at 80% 80%, #4a6cc4 0%, transparent 55%),
+      radial-gradient(100% 120% at 15% 20%, #1c2f6b 0%, transparent 60%),
+      linear-gradient(165deg, #131722 0%, #0b0d10 100%);
+  }
+  .cover-mesh-5 {
+    background: radial-gradient(120% 140% at 50% 0%, #2e5cb8 0%, transparent 50%),
+      radial-gradient(110% 130% at 100% 100%, #7793ed 0%, transparent 55%),
+      linear-gradient(160deg, #101a35 0%, #0b0d10 100%);
+  }
+  .cover-mesh-6 {
+    background: radial-gradient(120% 140% at 0% 100%, #104090 0%, transparent 55%),
+      radial-gradient(100% 120% at 100% 0%, #a9bbf5 0%, transparent 45%),
+      linear-gradient(160deg, #171326 0%, #0b0d10 100%);
+  }
+
+  .orb-glow {
+    animation: orb-pulse 3.2s ease-in-out infinite;
+  }
+  @keyframes orb-pulse {
+    0%,
+    100% {
+      box-shadow: 0 0 0 0 rgba(119, 147, 237, 0.35), 0 0 24px 4px rgba(119, 147, 237, 0.3);
+    }
+    50% {
+      box-shadow: 0 0 0 8px rgba(119, 147, 237, 0), 0 0 32px 10px rgba(119, 147, 237, 0.45);
+    }
+  }
 }
 
 html[data-density="compact"] [data-slot="card"] {

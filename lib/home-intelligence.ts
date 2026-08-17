@@ -1,4 +1,4 @@
-import { differenceInCalendarDays, isBefore, startOfToday } from "date-fns";
+import { differenceInCalendarDays, isBefore, startOfToday, startOfWeek, addDays, isSameDay } from "date-fns";
 import type { Task, Project, Goal, Milestone } from "@/types/entities";
 import { AlertTriangle, Clock, Target, Sparkles, type LucideIcon } from "lucide-react";
 
@@ -83,4 +83,25 @@ export function computeSpotlight(
     cta: "Voir le calendrier",
     href: "/calendar",
   };
+}
+
+/** Count of tasks completed per day (Mon→Sun) for the current week. */
+export function weeklyActivity(tasks: Task[]): { label: string; value: number }[] {
+  const start = startOfWeek(new Date(), { weekStartsOn: 1 });
+  return Array.from({ length: 7 }, (_, i) => {
+    const day = addDays(start, i);
+    const value = tasks.filter(
+      (t) => t.status === "done" && t.completed_at && isSameDay(new Date(t.completed_at), day)
+    ).length;
+    return { label: day.toLocaleDateString("fr-FR", { weekday: "narrow" }).toUpperCase(), value };
+  });
+}
+
+/** % of tasks due this week that are already done — used as the "focus" progress ring. */
+export function weeklyCompletion(tasks: Task[]): number {
+  const start = startOfWeek(new Date(), { weekStartsOn: 1 });
+  const end = addDays(start, 6);
+  const weekTasks = tasks.filter((t) => t.due_date && new Date(t.due_date) >= start && new Date(t.due_date) <= end);
+  if (weekTasks.length === 0) return 0;
+  return Math.round((weekTasks.filter((t) => t.status === "done").length / weekTasks.length) * 100);
 }

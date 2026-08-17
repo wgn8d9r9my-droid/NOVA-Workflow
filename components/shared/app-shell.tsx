@@ -4,6 +4,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { Sidebar } from "@/components/shared/sidebar";
 import { MobileNav } from "@/components/shared/mobile-nav";
+import { Topbar } from "@/components/shared/topbar";
 import { QuickCapture } from "@/components/shared/quick-capture";
 import { CommandPalette } from "@/components/shared/command-palette";
 import { ApplyPreferences } from "@/components/shared/apply-preferences";
@@ -12,6 +13,7 @@ import { usePreferencesStore } from "@/lib/store/preferences";
 import { useHydrated } from "@/lib/store/use-hydrated";
 import { useSupabaseUser } from "@/hooks/use-supabase-user";
 import { supabaseConfigured } from "@/lib/supabase/is-configured";
+import { useUIStore } from "@/lib/store/ui";
 
 export function AppShell({ children }: { children: ReactNode }) {
   const hydrated = useHydrated();
@@ -21,7 +23,10 @@ export function AppShell({ children }: { children: ReactNode }) {
   const { user, checked } = useSupabaseUser();
   const [prefsHydrated, setPrefsHydrated] = useState(!supabaseConfigured);
 
-  const [captureOpen, setCaptureOpen] = useState(false);
+  const captureOpen = useUIStore((s) => s.captureOpen);
+  const captureType = useUIStore((s) => s.captureType);
+  const setCaptureOpen = useUIStore((s) => s.setCaptureOpen);
+  const openCapture = useUIStore((s) => s.openCapture);
   const [paletteOpen, setPaletteOpen] = useState(false);
 
   useEffect(() => {
@@ -85,12 +90,13 @@ export function AppShell({ children }: { children: ReactNode }) {
     <div className="min-h-screen bg-background">
       <DataSync />
       <ApplyPreferences />
-      <Sidebar onQuickCapture={() => setCaptureOpen(true)} />
-      <main className="min-h-screen px-4 pb-28 pt-6 sm:px-6 lg:pb-10 lg:pl-[96px] lg:pr-8 lg:pt-8 xl:pl-[288px]">
+      <Sidebar onQuickCapture={() => openCapture()} onSearch={() => setPaletteOpen(true)} />
+      <main className="min-h-screen px-4 pb-28 pt-6 sm:px-6 lg:pb-10 lg:pl-[112px] lg:pr-8 lg:pt-8 xl:pl-[296px]">
+        <Topbar onSearch={() => setPaletteOpen(true)} />
         <div className="mx-auto w-full max-w-6xl">{children}</div>
       </main>
-      <MobileNav onQuickCapture={() => setCaptureOpen(true)} />
-      <QuickCapture open={captureOpen} onOpenChange={setCaptureOpen} />
+      <MobileNav onQuickCapture={() => openCapture()} />
+      <QuickCapture open={captureOpen} initialType={captureType} onOpenChange={setCaptureOpen} />
       <CommandPalette open={paletteOpen} onOpenChange={setPaletteOpen} />
     </div>
   );
