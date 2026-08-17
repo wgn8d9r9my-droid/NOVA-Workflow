@@ -231,11 +231,7 @@
   --shadow-glow: 0 0 0 1px rgba(119, 147, 237, 0.2), 0 8px 30px rgba(119, 147, 237, 0.16);
 
   --atmosphere-base: linear-gradient(165deg, #0d0e11 0%, #0a0b0d 50%, #08090b 100%);
-  --atmosphere-sun: #ffb970;
-  --atmosphere-sun-opacity: 0.4;
   --atmosphere-plant: #33553f;
-  --atmosphere-plant-opacity: 0.65;
-  --atmosphere-vignette: rgba(0, 0, 0, 0.6);
   --atmosphere-grain-opacity: 0.4;
 }
 
@@ -334,9 +330,10 @@
     }
   }
 
-  /* Ambiance theme's backdrop — warm light + soft greenery, styled after a
-     moody creative-studio photo. Only ever mounted while the "ambiance"
-     theme is active, so it never affects light/dark. */
+  /* Ambiance theme's backdrop — an illustrated creative-studio scene (plant,
+     camera, framed posters, warm window light, wood desk). Only ever
+     mounted while the "ambiance" theme is active, so it never touches
+     light/dark. */
   .atmosphere {
     position: fixed;
     inset: 0;
@@ -348,73 +345,11 @@
   .atmosphere::after {
     opacity: var(--atmosphere-grain-opacity);
   }
-  .atmosphere-sun {
-    position: absolute;
-    top: -22%;
-    right: -12%;
-    width: 62vw;
-    height: 62vw;
-    max-width: 900px;
-    max-height: 900px;
-    border-radius: 50%;
-    background: radial-gradient(circle, var(--atmosphere-sun) 0%, transparent 68%);
-    opacity: var(--atmosphere-sun-opacity);
-    filter: blur(10px);
-    animation: atmosphere-drift 26s ease-in-out infinite;
-  }
-  .atmosphere-plant {
-    position: absolute;
-    background: var(--atmosphere-plant);
-    opacity: var(--atmosphere-plant-opacity);
-    filter: blur(50px);
-  }
-  .atmosphere-plant-1 {
-    left: -12vw;
-    bottom: -6vw;
-    width: 40vw;
-    height: 40vw;
-    border-radius: 42% 58% 63% 37% / 41% 44% 56% 59%;
-    animation: atmosphere-sway 34s ease-in-out infinite;
-  }
-  .atmosphere-plant-2 {
-    left: -2vw;
-    bottom: 2vh;
-    width: 20vw;
-    height: 24vw;
-    border-radius: 60% 40% 55% 45% / 45% 55% 40% 60%;
-    animation: atmosphere-sway 28s ease-in-out infinite reverse;
-  }
-  .atmosphere-plant-3 {
-    right: 8vw;
-    top: 4vh;
-    width: 14vw;
-    height: 16vw;
-    border-radius: 55% 45% 40% 60% / 60% 40% 60% 40%;
-    opacity: calc(var(--atmosphere-plant-opacity) * 0.7);
-    animation: atmosphere-sway 30s ease-in-out infinite;
-  }
-  .atmosphere-vignette {
+  .atmosphere-scene {
     position: absolute;
     inset: 0;
-    background: radial-gradient(130% 100% at 50% 15%, transparent 35%, var(--atmosphere-vignette) 100%);
-  }
-  @keyframes atmosphere-drift {
-    0%,
-    100% {
-      transform: translate(0, 0) scale(1);
-    }
-    50% {
-      transform: translate(-3%, 2%) scale(1.05);
-    }
-  }
-  @keyframes atmosphere-sway {
-    0%,
-    100% {
-      transform: translate(0, 0) scale(1);
-    }
-    50% {
-      transform: translate(2%, -2%) scale(1.03);
-    }
+    width: 100%;
+    height: 100%;
   }
 }
 
