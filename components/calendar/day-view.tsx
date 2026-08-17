@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { ChevronDown } from "lucide-react";
-import { QuickAddTask } from "@/components/calendar/quick-add-task";
+import { AddEventButton } from "@/components/calendar/add-event-button";
 import { TaskRow } from "@/components/shared/task-row";
 import { useTasksStore } from "@/lib/store/tasks";
 import { useTaskCategoriesStore } from "@/lib/store/task-categories";
@@ -57,7 +57,7 @@ export function DayView({
 
   return (
     <div className="flex flex-col gap-6">
-      <QuickAddTask date={date} />
+      <AddEventButton date={date} />
 
       {allDay.length > 0 && (
         <div>
@@ -91,7 +91,7 @@ export function DayView({
 
             {layout.map(({ task, top, height, left, width, isRange }) => {
               const category = categoryFor(task.category_id);
-              const color = category?.color ?? PRIORITY_COLOR[task.priority];
+              const color = task.color ?? category?.color ?? PRIORITY_COLOR[task.priority];
               return (
                 <button
                   key={task.id}
@@ -116,6 +116,9 @@ export function DayView({
                       <span className="truncate text-[10px] leading-tight opacity-80">
                         {formatTimeRange(task.due_time, task.end_time)}
                       </span>
+                      {task.location && height >= 58 && (
+                        <span className="truncate text-[10px] leading-tight opacity-70">📍 {task.location}</span>
+                      )}
                     </>
                   ) : (
                     <>

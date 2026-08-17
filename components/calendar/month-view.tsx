@@ -57,7 +57,7 @@ export function MonthView({
               </span>
               <div className="flex flex-wrap gap-0.5">
                 {open.slice(0, 4).map((task) => {
-                  const color = categoryColor(task.category_id);
+                  const color = task.color ?? categoryColor(task.category_id);
                   return (
                     <span
                       key={task.id}

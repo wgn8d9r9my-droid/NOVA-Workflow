@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
-import { CalendarIcon, Clock, Trash2, X } from "lucide-react";
+import { CalendarIcon, Clock, MapPin, Users, Trash2, X } from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -25,6 +25,7 @@ import { cn } from "@/lib/utils";
 import { useTasksStore } from "@/lib/store/tasks";
 import { useProjectsStore } from "@/lib/store/projects";
 import { CategoryPicker } from "@/components/calendar/category-picker";
+import { accentColors } from "@/lib/accent-colors";
 import type { Priority, Task } from "@/types/entities";
 
 export function TaskEditorSheet({
@@ -55,6 +56,8 @@ function TaskEditorForm({ task, onDeleted }: { task: Task; onDeleted: () => void
 
   const [title, setTitle] = useState(task.title);
   const [tagsInput, setTagsInput] = useState(task.tags.join(", "));
+  const [location, setLocation] = useState(task.location ?? "");
+  const [attendees, setAttendees] = useState(task.attendees ?? "");
 
   return (
         <div className="mt-4 flex flex-col gap-5">
@@ -162,6 +165,62 @@ function TaskEditorForm({ task, onDeleted }: { task: Task; onDeleted: () => void
               onChange={(id) => updateTask(task.id, { category_id: id })}
               allowCreate
             />
+          </div>
+
+          <div>
+            <p className="mb-1.5 text-xs font-medium text-muted-foreground">Lieu</p>
+            <div className="flex items-center gap-2 rounded-lg border border-border/60 px-3 py-2">
+              <MapPin className="size-3.5 shrink-0 text-muted-foreground" />
+              <input
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+                onBlur={() => updateTask(task.id, { location: location.trim() || undefined })}
+                placeholder="Ex : Salle 204, Zoom…"
+                className="flex-1 bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
+              />
+            </div>
+          </div>
+
+          <div>
+            <p className="mb-1.5 text-xs font-medium text-muted-foreground">Personnes</p>
+            <div className="flex items-center gap-2 rounded-lg border border-border/60 px-3 py-2">
+              <Users className="size-3.5 shrink-0 text-muted-foreground" />
+              <input
+                value={attendees}
+                onChange={(e) => setAttendees(e.target.value)}
+                onBlur={() => updateTask(task.id, { attendees: attendees.trim() || undefined })}
+                placeholder="Ex : Léa, M. Dupont…"
+                className="flex-1 bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
+              />
+            </div>
+          </div>
+
+          <div>
+            <p className="mb-1.5 text-xs font-medium text-muted-foreground">Couleur de l&apos;évènement</p>
+            <div className="flex flex-wrap items-center gap-2">
+              <button
+                onClick={() => updateTask(task.id, { color: undefined })}
+                title="Automatique"
+                className={cn(
+                  "flex size-6 shrink-0 items-center justify-center rounded-full border-2 border-dashed text-muted-foreground transition-colors",
+                  !task.color ? "border-foreground/50 text-foreground" : "border-border/60 hover:border-foreground/40"
+                )}
+              >
+                <X className="size-3" />
+              </button>
+              {accentColors.map((c) => (
+                <button
+                  key={c.value}
+                  onClick={() => updateTask(task.id, { color: c.value })}
+                  title={c.name}
+                  className={cn(
+                    "size-6 shrink-0 rounded-full ring-2 ring-offset-2 ring-offset-background transition-transform hover:scale-105",
+                    task.color === c.value ? "ring-foreground/50" : "ring-transparent"
+                  )}
+                  style={{ background: c.value }}
+                />
+              ))}
+            </div>
           </div>
 
           <div>

@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { Plus, LayoutGrid, Kanban, List as ListIcon, GanttChartSquare, FolderPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ProjectFormDialog } from "@/components/projects/project-form-dialog";
 import { FolderFormDialog } from "@/components/projects/folder-form-dialog";
 import { ProjectCard } from "@/components/projects/project-card";
@@ -15,6 +16,7 @@ import { cn } from "@/lib/utils";
 import type { ProjectStatus } from "@/types/entities";
 
 type ViewMode = "cards" | "kanban" | "list";
+type SortMode = "recent" | "name" | "deadline";
 
 export default function ProjectsPage() {
   const projects = useProjectsStore((s) => s.items);
@@ -22,6 +24,7 @@ export default function ProjectsPage() {
   const [view, setView] = useState<ViewMode>("cards");
   const [statusFilter, setStatusFilter] = useState<ProjectStatus | "all">("all");
   const [folderFilter, setFolderFilter] = useState<string | "all">("all");
+  const [sortBy, setSortBy] = useState<SortMode>("recent");
 
   const filtered = useMemo(() => {
     let result = projects;
@@ -29,6 +32,22 @@ export default function ProjectsPage() {
     if (folderFilter !== "all") result = result.filter((p) => p.folder_id === folderFilter);
     return result;
   }, [projects, statusFilter, folderFilter]);
+
+  const sorted = useMemo(() => {
+    if (sortBy === "recent") return filtered;
+    const arr = [...filtered];
+    if (sortBy === "name") {
+      arr.sort((a, b) => a.name.localeCompare(b.name, "fr"));
+    } else if (sortBy === "deadline") {
+      arr.sort((a, b) => {
+        if (!a.deadline && !b.deadline) return 0;
+        if (!a.deadline) return 1;
+        if (!b.deadline) return -1;
+        return a.deadline.localeCompare(b.deadline);
+      });
+    }
+    return arr;
+  }, [filtered, sortBy]);
 
   return (
     <div className="flex flex-col gap-5 pb-6">
@@ -113,38 +132,51 @@ export default function ProjectsPage() {
           ))}
         </div>
 
-        <Tabs value={view} onValueChange={(v) => setView(v as ViewMode)}>
-          <TabsList>
-            <TabsTrigger value="cards" className="gap-1.5">
-              <LayoutGrid className="size-3.5" /> Cards
-            </TabsTrigger>
-            <TabsTrigger value="kanban" className="gap-1.5">
-              <Kanban className="size-3.5" /> Kanban
-            </TabsTrigger>
-            <TabsTrigger value="list" className="gap-1.5">
-              <ListIcon className="size-3.5" /> Liste
-            </TabsTrigger>
-            <TabsTrigger value="timeline" disabled className="gap-1.5 opacity-40">
-              <GanttChartSquare className="size-3.5" /> Timeline
-            </TabsTrigger>
-          </TabsList>
-        </Tabs>
+        <div className="flex items-center gap-2">
+          <Select value={sortBy} onValueChange={(v) => setSortBy(v as SortMode)}>
+            <SelectTrigger size="sm" className="w-[150px]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="recent">Plus récents</SelectItem>
+              <SelectItem value="name">Nom (A→Z)</SelectItem>
+              <SelectItem value="deadline">Échéance</SelectItem>
+            </SelectContent>
+          </Select>
+
+          <Tabs value={view} onValueChange={(v) => setView(v as ViewMode)}>
+            <TabsList>
+              <TabsTrigger value="cards" className="gap-1.5">
+                <LayoutGrid className="size-3.5" /> Cards
+              </TabsTrigger>
+              <TabsTrigger value="kanban" className="gap-1.5">
+                <Kanban className="size-3.5" /> Kanban
+              </TabsTrigger>
+              <TabsTrigger value="list" className="gap-1.5">
+                <ListIcon className="size-3.5" /> Liste
+              </TabsTrigger>
+              <TabsTrigger value="timeline" disabled className="gap-1.5 opacity-40">
+                <GanttChartSquare className="size-3.5" /> Timeline
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
+        </div>
       </div>
 
-      {filtered.length === 0 ? (
+      {sorted.length === 0 ? (
         <p className="px-1 py-12 text-center text-sm text-muted-foreground">
           Aucun projet ici — crée le premier avec le bouton ci-dessus.
         </p>
       ) : view === "cards" ? (
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {filtered.map((project) => (
+          {sorted.map((project) => (
             <ProjectCard key={project.id} project={project} />
           ))}
         </div>
       ) : view === "kanban" ? (
-        <KanbanBoard projects={filtered} />
+        <KanbanBoard projects={sorted} />
       ) : (
-        <ProjectList projects={filtered} />
+        <ProjectList projects={sorted} />
       )}
     </div>
   );

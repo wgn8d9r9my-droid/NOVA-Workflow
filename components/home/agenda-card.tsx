@@ -34,7 +34,7 @@ export function AgendaCard({
     >
       <div className="flex flex-col gap-3">
         {tasks.map((task) => {
-          const color = colorFor(task.id, projectColor(task.project_id));
+          const color = task.color ?? categoryColor(task.category_id) ?? colorFor(task.id, projectColor(task.project_id));
           return (
             <div key={task.id} className="flex items-start gap-3">
               <div className="flex w-11 shrink-0 flex-col items-end pt-0.5">

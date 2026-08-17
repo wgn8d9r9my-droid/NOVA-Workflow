@@ -11,6 +11,9 @@ export interface Task {
   due_date?: string; // ISO date (yyyy-mm-dd)
   due_time?: string; // HH:mm, 24h — start time
   end_time?: string; // HH:mm, 24h — set only for a ranged event
+  location?: string;
+  attendees?: string;
+  color?: string; // direct display color override; falls back to category, then priority
   category_id?: string;
   project_id?: string;
   goal_id?: string;

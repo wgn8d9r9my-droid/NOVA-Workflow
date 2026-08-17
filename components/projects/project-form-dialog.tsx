@@ -150,7 +150,7 @@ export function ProjectFormDialog({ trigger }: { trigger: ReactNode }) {
 
           <div>
             <p className="mb-1.5 text-xs font-medium text-muted-foreground">Couleur (optionnel)</p>
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               {projectColors.map((c) => (
                 <button
                   key={c}

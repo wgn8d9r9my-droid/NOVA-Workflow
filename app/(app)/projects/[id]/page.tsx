@@ -235,7 +235,7 @@ export default function ProjectDetailPage() {
             </Select>
           )}
 
-          <div className="flex items-center gap-1.5">
+          <div className="flex flex-wrap items-center gap-1.5">
             {projectColors.map((c) => (
               <button
                 key={c}

@@ -7,6 +7,10 @@ export function inMonth(transactions: Transaction[], year: number, month: number
   });
 }
 
+export function inYear(transactions: Transaction[], year: number) {
+  return transactions.filter((t) => new Date(t.date).getFullYear() === year);
+}
+
 export function summary(transactions: Transaction[]) {
   const income = transactions.filter((t) => t.type === "income").reduce((sum, t) => sum + t.amount, 0);
   const expense = transactions.filter((t) => t.type === "expense").reduce((sum, t) => sum + t.amount, 0);

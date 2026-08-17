@@ -57,7 +57,9 @@ export function TaskRow({
         )}
       </button>
 
-      {category && <span className="size-1.5 shrink-0 rounded-full" style={{ background: category.color }} />}
+      {(task.color || category) && (
+        <span className="size-1.5 shrink-0 rounded-full" style={{ background: task.color ?? category?.color }} />
+      )}
 
       <span
         className={cn(

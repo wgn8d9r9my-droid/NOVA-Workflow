@@ -121,6 +121,9 @@ create table if not exists public.tasks (
   due_time time,
   end_time time,
   duration_minutes integer,
+  location text,
+  attendees text,
+  color text,
   category_id uuid references public.task_categories (id) on delete set null,
   project_id uuid references public.projects (id) on delete set null,
   goal_id uuid references public.goals (id) on delete set null,
@@ -134,6 +137,9 @@ create table if not exists public.tasks (
 -- exists, so add the new columns explicitly too.
 alter table public.tasks add column if not exists end_time time;
 alter table public.tasks add column if not exists category_id uuid references public.task_categories (id) on delete set null;
+alter table public.tasks add column if not exists location text;
+alter table public.tasks add column if not exists attendees text;
+alter table public.tasks add column if not exists color text;
 
 -- =========================================================================
 -- notes (notes + ideas, Creative Lab)
