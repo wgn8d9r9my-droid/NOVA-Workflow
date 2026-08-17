@@ -296,7 +296,10 @@
   .atmosphere {
     position: fixed;
     inset: 0;
-    z-index: 0;
+    /* Negative (not 0) so it stacks behind every normal-flow page element,
+       including plain, non-positioned cards (Settings, Business, Finances…)
+       — z-index:0 would still paint above unpositioned static content. */
+    z-index: -1;
     overflow: hidden;
     pointer-events: none;
     background: var(--atmosphere-base);
