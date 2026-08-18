@@ -37,11 +37,11 @@ export function DataSync() {
   useEffect(() => {
     if (!supabaseConfigured || !user) return;
 
-    let cancelled = false;
-
-    if (!cancelled) {
+    function pullAll() {
       Promise.all(ENTITY_STORES.map(({ store }) => store.getState().hydrateFromRemote()));
     }
+
+    pullAll();
 
     const supabase = createClient();
     const channels = ENTITY_STORES.map(({ table, store }) =>
@@ -61,9 +61,22 @@ export function DataSync() {
         .subscribe()
     );
 
+    // Realtime only streams changes made while this tab is live-connected —
+    // a change made on another device while this one was backgrounded,
+    // asleep, or offline (phone locked, laptop closed, wifi drop) is never
+    // replayed, so the device silently drifts stale until something re-pulls.
+    // Catch up explicitly whenever the tab regains focus or the network
+    // comes back, which is exactly when a user notices something's missing.
+    function onVisibilityChange() {
+      if (document.visibilityState === "visible") pullAll();
+    }
+    document.addEventListener("visibilitychange", onVisibilityChange);
+    window.addEventListener("online", pullAll);
+
     return () => {
-      cancelled = true;
       for (const channel of channels) supabase.removeChannel(channel);
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+      window.removeEventListener("online", pullAll);
     };
   }, [user]);
 
