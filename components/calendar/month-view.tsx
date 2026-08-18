@@ -2,6 +2,7 @@
 
 import { useMemo } from "react";
 import { format, isToday, isSameMonth } from "date-fns";
+import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTasksStore } from "@/lib/store/tasks";
 import { useTaskCategoriesStore } from "@/lib/store/task-categories";
@@ -26,11 +27,21 @@ export function MonthView({
   onOpenTask: (id: string) => void;
 }) {
   const tasks = useTasksStore((s) => s.items);
+  const updateTask = useTasksStore((s) => s.update);
   const categories = useTaskCategoriesStore((s) => s.items);
   const days = useMemo(() => monthGrid(date), [date]);
 
   function categoryFor(id?: string) {
     return id ? categories.find((c) => c.id === id) : undefined;
+  }
+
+  function toggleTask(id: string) {
+    const task = tasks.find((t) => t.id === id);
+    if (!task) return;
+    updateTask(id, {
+      status: task.status === "done" ? "todo" : "done",
+      completed_at: task.status === "done" ? undefined : new Date().toISOString(),
+    });
   }
 
   return (
@@ -44,9 +55,7 @@ export function MonthView({
       </div>
       <div className="grid grid-cols-7">
         {days.map((day) => {
-          const dayTasks = tasksForDate(tasks, day)
-            .filter((t) => t.status === "todo")
-            .sort((a, b) => (a.due_time ?? "").localeCompare(b.due_time ?? ""));
+          const dayTasks = tasksForDate(tasks, day).sort((a, b) => (a.due_time ?? "").localeCompare(b.due_time ?? ""));
           return (
             <div
               key={day.toISOString()}
@@ -70,15 +79,31 @@ export function MonthView({
                 {dayTasks.slice(0, 3).map((task) => {
                   const category = categoryFor(task.category_id);
                   const color = task.color ?? category?.color ?? PRIORITY_COLOR[task.priority];
+                  const done = task.status === "done";
                   return (
                     <button
                       key={task.id}
                       onClick={() => onOpenTask(task.id)}
                       style={{ background: color }}
-                      className="truncate rounded px-1 py-0.5 text-left text-[10px] leading-tight text-white shadow-soft transition-opacity hover:opacity-90"
+                      className={cn(
+                        "flex items-center gap-1 truncate rounded px-1 py-0.5 text-left text-[10px] leading-tight text-white shadow-soft transition-opacity hover:opacity-90",
+                        done && "opacity-45"
+                      )}
                     >
-                      {task.due_time && <span className="tabular-nums opacity-80">{task.due_time} </span>}
-                      {task.title}
+                      <span
+                        role="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleTask(task.id);
+                        }}
+                        className="flex size-2.5 shrink-0 items-center justify-center rounded-full border border-white/70 bg-white/10"
+                      >
+                        {done && <Check className="size-2 text-white" strokeWidth={3} />}
+                      </span>
+                      <span className={cn("truncate", done && "line-through")}>
+                        {task.due_time && <span className="tabular-nums opacity-80">{task.due_time} </span>}
+                        {task.title}
+                      </span>
                     </button>
                   );
                 })}

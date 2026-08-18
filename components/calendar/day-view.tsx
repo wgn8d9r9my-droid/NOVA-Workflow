@@ -1,7 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { ChevronDown } from "lucide-react";
+import { useMemo } from "react";
+import { Check } from "lucide-react";
 import { AddEventButton } from "@/components/calendar/add-event-button";
 import { TaskRow } from "@/components/shared/task-row";
 import { useTasksStore } from "@/lib/store/tasks";
@@ -34,12 +34,9 @@ export function DayView({
   const tasks = useTasksStore((s) => s.items);
   const updateTask = useTasksStore((s) => s.update);
   const categories = useTaskCategoriesStore((s) => s.items);
-  const [showCompleted, setShowCompleted] = useState(false);
 
   const dayTasks = useMemo(() => tasksForDate(tasks, date), [tasks, date]);
-  const open = useMemo(() => dayTasks.filter((t) => t.status === "todo"), [dayTasks]);
-  const completed = useMemo(() => dayTasks.filter((t) => t.status === "done"), [dayTasks]);
-  const { allDay, timed } = useMemo(() => splitByTime(open), [open]);
+  const { allDay, timed } = useMemo(() => splitByTime(dayTasks), [dayTasks]);
   const layout = useMemo(() => layoutDayTasks(timed), [timed]);
 
   function toggleTask(id: string) {
@@ -92,6 +89,7 @@ export function DayView({
             {layout.map(({ task, top, height, left, width, isRange }) => {
               const category = categoryFor(task.category_id);
               const color = task.color ?? category?.color ?? PRIORITY_COLOR[task.priority];
+              const done = task.status === "done";
               return (
                 <button
                   key={task.id}
@@ -107,12 +105,27 @@ export function DayView({
                     "group absolute overflow-hidden rounded-lg text-left transition-opacity hover:opacity-90",
                     isRange
                       ? "flex flex-col justify-start px-2 py-1 text-[11px] text-white shadow-soft"
-                      : "flex items-center gap-1.5 px-1.5 text-[11px] hover:bg-black/[0.03] dark:hover:bg-white/[0.05]"
+                      : "flex items-center gap-1.5 px-1.5 text-[11px] hover:bg-black/[0.03] dark:hover:bg-white/[0.05]",
+                    done && "opacity-45"
                   )}
                 >
                   {isRange ? (
                     <>
-                      <span className="truncate font-medium leading-tight">{task.title}</span>
+                      <div className="flex items-start justify-between gap-1">
+                        <span className={cn("truncate font-medium leading-tight", done && "line-through")}>
+                          {task.title}
+                        </span>
+                        <span
+                          role="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleTask(task.id);
+                          }}
+                          className="flex size-4 shrink-0 items-center justify-center rounded-full border border-white/70 bg-white/10"
+                        >
+                          {done && <Check className="size-2.5 text-white" strokeWidth={3} />}
+                        </span>
+                      </div>
                       <span className="truncate text-[10px] leading-tight opacity-80">
                         {formatTimeRange(task.due_time, task.end_time)}
                       </span>
@@ -122,8 +135,18 @@ export function DayView({
                     </>
                   ) : (
                     <>
-                      <span className="size-2 shrink-0 rounded-full" style={{ background: color }} />
-                      <span className="truncate text-foreground">
+                      <span
+                        role="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleTask(task.id);
+                        }}
+                        className="flex size-3 shrink-0 items-center justify-center rounded-full border"
+                        style={{ borderColor: color, background: done ? color : "transparent" }}
+                      >
+                        {done && <Check className="size-2 text-white" strokeWidth={3} />}
+                      </span>
+                      <span className={cn("truncate text-foreground", done && "line-through text-muted-foreground/60")}>
                         <span className="tabular-nums text-muted-foreground">{task.due_time}</span> {task.title}
                       </span>
                     </>
@@ -134,25 +157,6 @@ export function DayView({
           </div>
         </div>
       </div>
-
-      {completed.length > 0 && (
-        <div>
-          <button
-            onClick={() => setShowCompleted((v) => !v)}
-            className="mb-1.5 flex items-center gap-1 px-1 text-xs font-medium text-muted-foreground"
-          >
-            Terminées · {completed.length}
-            <ChevronDown className={cn("size-3.5 transition-transform", showCompleted && "rotate-180")} />
-          </button>
-          {showCompleted && (
-            <div className="flex flex-col rounded-2xl border border-border/60 p-2">
-              {completed.map((task) => (
-                <TaskRow key={task.id} task={task} onToggle={toggleTask} onOpen={onOpenTask} />
-              ))}
-            </div>
-          )}
-        </div>
-      )}
     </div>
   );
 }

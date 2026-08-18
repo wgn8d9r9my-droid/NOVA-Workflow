@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
-import { CalendarIcon, Clock, MapPin, Users, Trash2, X } from "lucide-react";
+import { CalendarIcon, Clock, MapPin, Users, Check, Trash2, X } from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -61,12 +61,31 @@ function TaskEditorForm({ task, onDeleted }: { task: Task; onDeleted: () => void
 
   return (
         <div className="mt-4 flex flex-col gap-5">
-          <Input
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            onBlur={() => title.trim() && updateTask(task.id, { title: title.trim() })}
-            className="border-none px-0 text-lg font-medium shadow-none focus-visible:ring-0"
-          />
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() =>
+                updateTask(task.id, {
+                  status: task.status === "done" ? "todo" : "done",
+                  completed_at: task.status === "done" ? undefined : new Date().toISOString(),
+                })
+              }
+              className={cn(
+                "flex size-6 shrink-0 items-center justify-center rounded-full border transition-colors",
+                task.status === "done" ? "border-primary bg-primary" : "border-border hover:border-primary/60"
+              )}
+            >
+              {task.status === "done" && <Check className="size-3.5 text-primary-foreground" strokeWidth={3} />}
+            </button>
+            <Input
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              onBlur={() => title.trim() && updateTask(task.id, { title: title.trim() })}
+              className={cn(
+                "border-none px-0 text-lg font-medium shadow-none focus-visible:ring-0",
+                task.status === "done" && "text-muted-foreground line-through"
+              )}
+            />
+          </div>
 
           <div>
             <p className="mb-1.5 text-xs font-medium text-muted-foreground">Priorité</p>

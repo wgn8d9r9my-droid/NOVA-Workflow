@@ -3,6 +3,7 @@
 import { useMemo } from "react";
 import { format, isToday } from "date-fns";
 import { fr } from "date-fns/locale";
+import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTasksStore } from "@/lib/store/tasks";
 import { useTaskCategoriesStore } from "@/lib/store/task-categories";
@@ -35,6 +36,7 @@ export function WeekView({
   onOpenTask: (id: string) => void;
 }) {
   const tasks = useTasksStore((s) => s.items);
+  const updateTask = useTasksStore((s) => s.update);
   const categories = useTaskCategoriesStore((s) => s.items);
   const days = useMemo(() => weekDays(date), [date]);
 
@@ -42,11 +44,20 @@ export function WeekView({
     return id ? categories.find((c) => c.id === id) : undefined;
   }
 
+  function toggleTask(id: string) {
+    const task = tasks.find((t) => t.id === id);
+    if (!task) return;
+    updateTask(id, {
+      status: task.status === "done" ? "todo" : "done",
+      completed_at: task.status === "done" ? undefined : new Date().toISOString(),
+    });
+  }
+
   const byDay = useMemo(
     () =>
       days.map((day) => {
-        const open = tasksForDate(tasks, day).filter((t) => t.status === "todo");
-        const { allDay, timed } = splitByTime(open);
+        const dayTasks = tasksForDate(tasks, day);
+        const { allDay, timed } = splitByTime(dayTasks);
         return { day, allDay, layout: layoutDayTasks(timed) };
       }),
     [days, tasks]
@@ -57,6 +68,7 @@ export function WeekView({
   function renderBlock(task: Task, top: number, height: number, left: number, width: number, isRange: boolean) {
     const category = categoryFor(task.category_id);
     const color = task.color ?? category?.color ?? PRIORITY_COLOR[task.priority];
+    const done = task.status === "done";
     return (
       <button
         key={task.id}
@@ -72,18 +84,41 @@ export function WeekView({
           "group absolute overflow-hidden rounded-md text-left leading-tight transition-opacity hover:opacity-90",
           isRange
             ? "flex flex-col justify-start px-1 py-0.5 text-[9px] text-white shadow-soft"
-            : "flex items-center gap-1 px-1 text-[9px] hover:bg-black/[0.03] dark:hover:bg-white/[0.05]"
+            : "flex items-center gap-1 px-1 text-[9px] hover:bg-black/[0.03] dark:hover:bg-white/[0.05]",
+          done && "opacity-45"
         )}
       >
         {isRange ? (
           <>
-            <span className="truncate font-medium">{task.title}</span>
+            <div className="flex items-start justify-between gap-0.5">
+              <span className={cn("truncate font-medium", done && "line-through")}>{task.title}</span>
+              <span
+                role="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggleTask(task.id);
+                }}
+                className="flex size-3 shrink-0 items-center justify-center rounded-full border border-white/70 bg-white/10"
+              >
+                {done && <Check className="size-2 text-white" strokeWidth={3} />}
+              </span>
+            </div>
             <span className="truncate opacity-80">{formatTimeRange(task.due_time, task.end_time)}</span>
           </>
         ) : (
           <>
-            <span className="size-1.5 shrink-0 rounded-full" style={{ background: color }} />
-            <span className="truncate text-foreground">{task.title}</span>
+            <span
+              role="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                toggleTask(task.id);
+              }}
+              className="flex size-2.5 shrink-0 items-center justify-center rounded-full border"
+              style={{ borderColor: color, background: done ? color : "transparent" }}
+            />
+            <span className={cn("truncate text-foreground", done && "line-through text-muted-foreground/60")}>
+              {task.title}
+            </span>
           </>
         )}
       </button>
@@ -120,17 +155,29 @@ export function WeekView({
                 {allDay.slice(0, 3).map((task) => {
                   const category = categoryFor(task.category_id);
                   const color = task.color ?? category?.color;
+                  const done = task.status === "done";
                   return (
                     <button
                       key={task.id}
                       onClick={() => onOpenTask(task.id)}
-                      className="flex items-center gap-1 truncate rounded-md px-1 py-0.5 text-left text-[9px] hover:bg-muted"
+                      className={cn(
+                        "flex items-center gap-1 truncate rounded-md px-1 py-0.5 text-left text-[9px] hover:bg-muted",
+                        done && "opacity-45"
+                      )}
                     >
                       <span
-                        className={cn("size-1.5 shrink-0 rounded-full", !color && priorityDotClass[task.priority])}
+                        role="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleTask(task.id);
+                        }}
+                        className={cn(
+                          "size-1.5 shrink-0 rounded-full",
+                          !color && priorityDotClass[task.priority]
+                        )}
                         style={color ? { background: color } : undefined}
                       />
-                      <span className="truncate">{task.title}</span>
+                      <span className={cn("truncate", done && "line-through")}>{task.title}</span>
                     </button>
                   );
                 })}
