@@ -178,6 +178,24 @@ export interface JournalEntry {
   updated_at: string;
 }
 
+export interface Subject {
+  id: string;
+  name: string;
+  color: string;
+  emoji?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CourseNote {
+  id: string;
+  subject_id?: string;
+  title: string;
+  content: Record<string, unknown>; // Tiptap JSON document
+  created_at: string;
+  updated_at: string;
+}
+
 export type Density = "comfortable" | "compact";
 
 export interface UserPreferences {

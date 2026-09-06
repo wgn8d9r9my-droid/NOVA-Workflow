@@ -367,3 +367,108 @@
 html[data-density="compact"] [data-slot="card"] {
   --card-spacing: --spacing(3);
 }
+
+/* Cours — Tiptap rich-text content (hand-rolled instead of pulling in the
+   Tailwind typography plugin just for this one editor). */
+.tiptap-content {
+  outline: none;
+}
+.tiptap-content > * + * {
+  margin-top: 0.5em;
+}
+.tiptap-content h1 {
+  font-size: 1.6em;
+  font-weight: 700;
+  line-height: 1.3;
+  margin-top: 0.8em;
+}
+.tiptap-content h2 {
+  font-size: 1.3em;
+  font-weight: 700;
+  line-height: 1.35;
+  margin-top: 0.7em;
+}
+.tiptap-content h3 {
+  font-size: 1.1em;
+  font-weight: 600;
+  line-height: 1.4;
+  margin-top: 0.6em;
+}
+.tiptap-content p {
+  line-height: 1.65;
+}
+.tiptap-content ul,
+.tiptap-content ol {
+  padding-left: 1.4em;
+}
+.tiptap-content ul {
+  list-style: disc;
+}
+.tiptap-content ol {
+  list-style: decimal;
+}
+.tiptap-content li p {
+  margin: 0;
+}
+.tiptap-content blockquote {
+  border-left: 3px solid var(--border);
+  padding-left: 0.9em;
+  color: var(--muted-foreground);
+  font-style: italic;
+}
+.tiptap-content code {
+  background: var(--muted);
+  border-radius: 4px;
+  padding: 0.1em 0.4em;
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+}
+.tiptap-content pre {
+  background: var(--muted);
+  border-radius: var(--radius-md);
+  padding: 0.75em 1em;
+  overflow-x: auto;
+}
+.tiptap-content pre code {
+  background: none;
+  padding: 0;
+}
+.tiptap-content mark {
+  background: #fde68a;
+  color: #1a1d21;
+  border-radius: 3px;
+  padding: 0 0.15em;
+}
+.tiptap-content hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 1em 0;
+}
+.tiptap-content ul[data-type="taskList"] {
+  list-style: none;
+  padding-left: 0;
+}
+.tiptap-content ul[data-type="taskList"] li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.55em;
+}
+.tiptap-content ul[data-type="taskList"] li > label {
+  margin-top: 0.3em;
+  user-select: none;
+}
+.tiptap-content ul[data-type="taskList"] li > div {
+  flex: 1;
+}
+.tiptap-content ul[data-type="taskList"] li[data-checked="true"] > div {
+  text-decoration: line-through;
+  opacity: 0.55;
+}
+.tiptap-content .is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  color: var(--muted-foreground);
+  opacity: 0.7;
+  pointer-events: none;
+}

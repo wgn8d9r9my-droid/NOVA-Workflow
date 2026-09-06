@@ -8,6 +8,7 @@ import {
   Flame,
   Sparkles,
   BookOpen,
+  GraduationCap,
   Bot,
   type LucideIcon,
 } from "lucide-react";
@@ -29,5 +30,6 @@ export const navItems: NavItem[] = [
   { label: "Habits", href: "/habits", icon: Flame },
   { label: "Creative", href: "/creative", icon: Sparkles },
   { label: "Journal", href: "/journal", icon: BookOpen },
+  { label: "Cours", href: "/courses", icon: GraduationCap },
   { label: "Nova AI", href: "/nova", icon: Bot },
 ];

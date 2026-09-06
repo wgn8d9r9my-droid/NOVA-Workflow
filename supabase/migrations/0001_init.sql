@@ -158,6 +158,29 @@ create table if not exists public.notes (
 );
 
 -- =========================================================================
+-- subjects + course_notes (Cours — Notion-style rich notes per subject)
+-- =========================================================================
+create table if not exists public.subjects (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users (id) on delete cascade,
+  name text not null,
+  color text not null default '#104090',
+  emoji text,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create table if not exists public.course_notes (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users (id) on delete cascade,
+  subject_id uuid references public.subjects (id) on delete set null,
+  title text not null default 'Sans titre',
+  content jsonb not null default '{}',
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+-- =========================================================================
 -- journal_entries (private)
 -- =========================================================================
 create table if not exists public.journal_entries (
@@ -261,6 +284,9 @@ create table if not exists public.ai_actions_log (
 -- Indexes
 -- =========================================================================
 create index if not exists task_categories_user_id_idx on public.task_categories (user_id);
+create index if not exists subjects_user_id_idx on public.subjects (user_id);
+create index if not exists course_notes_user_id_idx on public.course_notes (user_id);
+create index if not exists course_notes_subject_id_idx on public.course_notes (subject_id);
 create index if not exists tasks_category_id_idx on public.tasks (category_id);
 create index if not exists tasks_user_id_idx on public.tasks (user_id);
 create index if not exists tasks_project_id_idx on public.tasks (project_id);
@@ -287,6 +313,8 @@ alter table public.clients enable row level security;
 alter table public.project_folders enable row level security;
 alter table public.projects enable row level security;
 alter table public.task_categories enable row level security;
+alter table public.subjects enable row level security;
+alter table public.course_notes enable row level security;
 alter table public.tasks enable row level security;
 alter table public.notes enable row level security;
 alter table public.journal_entries enable row level security;
@@ -323,6 +351,14 @@ create policy "own rows" on public.projects
 
 drop policy if exists "own rows" on public.task_categories;
 create policy "own rows" on public.task_categories
+  for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
+
+drop policy if exists "own rows" on public.subjects;
+create policy "own rows" on public.subjects
+  for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
+
+drop policy if exists "own rows" on public.course_notes;
+create policy "own rows" on public.course_notes
   for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 
 drop policy if exists "own rows" on public.tasks;
