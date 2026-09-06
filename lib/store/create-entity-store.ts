@@ -10,6 +10,10 @@ interface BaseEntity {
 
 interface EntityState<T extends BaseEntity> {
   items: T[];
+  // Ids removed locally, kept until a hydrate confirms Supabase has also
+  // dropped them — prevents a stale copy on another device from being
+  // resurrected (and re-pushed to the cloud) by the next catch-up pull.
+  deletedIds: string[];
   add: (item: Omit<T, "id" | "created_at" | "updated_at">) => T;
   update: (id: string, patch: Partial<Omit<T, "id" | "created_at">>) => void;
   remove: (id: string) => void;
@@ -24,6 +28,7 @@ export function createEntityStore<T extends BaseEntity>(storageKey: string, tabl
     persist(
       (set, get) => ({
         items: [],
+        deletedIds: [],
         add: (item) => {
           const now = new Date().toISOString();
           const entity = {
@@ -46,7 +51,10 @@ export function createEntityStore<T extends BaseEntity>(storageKey: string, tabl
           if (table) syncUpdate(table, id, { ...patch, updated_at });
         },
         remove: (id) => {
-          set((state) => ({ items: state.items.filter((entity) => entity.id !== id) }));
+          set((state) => ({
+            items: state.items.filter((entity) => entity.id !== id),
+            deletedIds: state.deletedIds.includes(id) ? state.deletedIds : [...state.deletedIds, id],
+          }));
           if (table) syncRemove(table, id);
         },
         get: (id) => get().items.find((entity) => entity.id === id),
@@ -59,10 +67,17 @@ export function createEntityStore<T extends BaseEntity>(storageKey: string, tabl
           const remote = await syncPullAll<T>(table);
           if (remote === null) return;
 
-          const local = get().items;
+          const { items: local, deletedIds } = get();
+          const deletedSet = new Set(deletedIds);
+
           const merged = new Map<string, T>();
-          for (const item of local) merged.set(item.id, item);
+          for (const item of local) {
+            if (!deletedSet.has(item.id)) merged.set(item.id, item);
+          }
           for (const item of remote) {
+            // Skip rows we deleted locally — remote just hasn't caught up
+            // yet, so treating them as live here would resurrect them.
+            if (deletedSet.has(item.id)) continue;
             const existing = merged.get(item.id);
             if (!existing || new Date(item.updated_at) >= new Date(existing.updated_at)) {
               merged.set(item.id, item);
@@ -70,7 +85,16 @@ export function createEntityStore<T extends BaseEntity>(storageKey: string, tabl
           }
 
           const result = Array.from(merged.values());
-          set({ items: result });
+
+          // Re-fire the delete for any tombstone Supabase still has (the
+          // original syncRemove call may never have reached the server if
+          // this device went offline right after deleting); drop tombstones
+          // that are already gone everywhere so the list doesn't grow forever.
+          const stillRemote = remote.filter((r) => deletedSet.has(r.id));
+          for (const r of stillRemote) syncRemove(table, r.id);
+          const nextDeletedIds = stillRemote.map((r) => r.id);
+
+          set({ items: result, deletedIds: nextDeletedIds });
 
           for (const item of result) {
             const remoteMatch = remote.find((r) => r.id === item.id);
@@ -83,6 +107,7 @@ export function createEntityStore<T extends BaseEntity>(storageKey: string, tabl
         },
         applyRemoteUpsert: (entity) => {
           set((state) => {
+            if (state.deletedIds.includes(entity.id)) return state;
             const exists = state.items.some((e) => e.id === entity.id);
             return {
               items: exists
@@ -92,7 +117,10 @@ export function createEntityStore<T extends BaseEntity>(storageKey: string, tabl
           });
         },
         applyRemoteDelete: (id) => {
-          set((state) => ({ items: state.items.filter((e) => e.id !== id) }));
+          set((state) => ({
+            items: state.items.filter((e) => e.id !== id),
+            deletedIds: state.deletedIds.filter((d) => d !== id),
+          }));
         },
       }),
       { name: storageKey }
