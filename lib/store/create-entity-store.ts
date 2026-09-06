@@ -14,6 +14,11 @@ interface EntityState<T extends BaseEntity> {
   // dropped them — prevents a stale copy on another device from being
   // resurrected (and re-pushed to the cloud) by the next catch-up pull.
   deletedIds: string[];
+  // Ids this device has actually seen in Supabase as of its last pull. If a
+  // local item is in this set but missing from the next pull, another
+  // device deleted it — that's a confirmed delete, not a pending write, so
+  // it gets dropped locally instead of pushed back to the cloud.
+  knownRemoteIds: string[];
   add: (item: Omit<T, "id" | "created_at" | "updated_at">) => T;
   update: (id: string, patch: Partial<Omit<T, "id" | "created_at">>) => void;
   remove: (id: string) => void;
@@ -29,6 +34,7 @@ export function createEntityStore<T extends BaseEntity>(storageKey: string, tabl
       (set, get) => ({
         items: [],
         deletedIds: [],
+        knownRemoteIds: [],
         add: (item) => {
           const now = new Date().toISOString();
           const entity = {
@@ -67,12 +73,19 @@ export function createEntityStore<T extends BaseEntity>(storageKey: string, tabl
           const remote = await syncPullAll<T>(table);
           if (remote === null) return;
 
-          const { items: local, deletedIds } = get();
+          const { items: local, deletedIds, knownRemoteIds } = get();
           const deletedSet = new Set(deletedIds);
+          const knownSet = new Set(knownRemoteIds);
+          const remoteIds = new Set(remote.map((r) => r.id));
 
           const merged = new Map<string, T>();
           for (const item of local) {
-            if (!deletedSet.has(item.id)) merged.set(item.id, item);
+            if (deletedSet.has(item.id)) continue; // we deleted it — don't resurrect
+            // Previously confirmed to exist remotely, but gone from this
+            // pull: another device deleted it. Drop it instead of treating
+            // the absence as "hasn't synced yet" and pushing it back.
+            if (knownSet.has(item.id) && !remoteIds.has(item.id)) continue;
+            merged.set(item.id, item);
           }
           for (const item of remote) {
             // Skip rows we deleted locally — remote just hasn't caught up
@@ -94,7 +107,7 @@ export function createEntityStore<T extends BaseEntity>(storageKey: string, tabl
           for (const r of stillRemote) syncRemove(table, r.id);
           const nextDeletedIds = stillRemote.map((r) => r.id);
 
-          set({ items: result, deletedIds: nextDeletedIds });
+          set({ items: result, deletedIds: nextDeletedIds, knownRemoteIds: Array.from(remoteIds) });
 
           for (const item of result) {
             const remoteMatch = remote.find((r) => r.id === item.id);

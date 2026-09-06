@@ -76,10 +76,20 @@ export function DataSync() {
     document.addEventListener("visibilitychange", onVisibilityChange);
     window.addEventListener("online", pullAll);
 
+    // Belt-and-suspenders backstop: a realtime INSERT/UPDATE/DELETE can be
+    // missed by the receiving device (a channel silently drops a message, a
+    // brief network hiccup) and this device's own write can just as silently
+    // fail to reach Supabase in the first place, in which case nothing ever
+    // notifies anyone. Re-pulling periodically catches both cases within a
+    // bounded delay even while the tab stays focused the whole time, instead
+    // of only correcting itself when focus/network events happen to fire.
+    const intervalId = setInterval(pullAll, 30_000);
+
     return () => {
       for (const channel of channels) supabase.removeChannel(channel);
       document.removeEventListener("visibilitychange", onVisibilityChange);
       window.removeEventListener("online", pullAll);
+      clearInterval(intervalId);
     };
   }, [user]);
 
