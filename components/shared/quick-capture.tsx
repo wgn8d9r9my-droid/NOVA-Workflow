@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { CheckSquare, StickyNote, Lightbulb, FolderPlus, Receipt, BookOpen } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -52,6 +52,10 @@ export function QuickCapture({
   const addTask = useTasksStore((s) => s.add);
   const addNote = useNotesStore((s) => s.add);
   const addProject = useProjectsStore((s) => s.add);
+  // Guards against a double Enter+click firing submit() twice before the
+  // sheet visually closes, which used to create two separate entries for a
+  // single "add" action.
+  const submittingRef = useRef(false);
 
   function reset() {
     setType(initialType ?? null);
@@ -61,11 +65,16 @@ export function QuickCapture({
 
   function handleOpenChange(v: boolean) {
     onOpenChange(v);
-    if (!v) reset();
+    if (v) {
+      submittingRef.current = false;
+    } else {
+      reset();
+    }
   }
 
   function submit() {
-    if (!value.trim() || !type) return;
+    if (!value.trim() || !type || submittingRef.current) return;
+    submittingRef.current = true;
     switch (type) {
       case "task":
         addTask({ title: value.trim(), priority, status: "todo", tags: [] });

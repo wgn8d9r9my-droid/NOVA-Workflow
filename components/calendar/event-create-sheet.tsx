@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { CalendarIcon, Clock, MapPin, Users, X } from "lucide-react";
@@ -35,6 +35,10 @@ export function EventCreateSheet({
   const [priority, setPriority] = useState<Priority>("P2");
   const [categoryId, setCategoryId] = useState<string | undefined>(undefined);
   const [color, setColor] = useState<string | undefined>(undefined);
+  // Guards against a double Enter+click (or a double-tap) firing submit()
+  // twice before the sheet visually closes, which used to create two
+  // separate tasks with two different ids for a single "add" action.
+  const submittingRef = useRef(false);
 
   function reset() {
     setTitle("");
@@ -50,11 +54,16 @@ export function EventCreateSheet({
 
   function handleOpenChange(v: boolean) {
     onOpenChange(v);
-    if (!v) reset();
+    if (v) {
+      submittingRef.current = false;
+    } else {
+      reset();
+    }
   }
 
   function submit() {
-    if (!title.trim()) return;
+    if (!title.trim() || submittingRef.current) return;
+    submittingRef.current = true;
     addTask({
       title: title.trim(),
       priority,
