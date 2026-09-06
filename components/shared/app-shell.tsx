@@ -92,7 +92,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   return (
     <div className="min-h-screen">
-      {theme === "ambiance" && <Atmosphere />}
+      {(theme === "ambiance" || theme === "passion") && <Atmosphere />}
       <DataSync />
       <ApplyPreferences />
       <Sidebar onQuickCapture={() => openCapture()} onSearch={() => setPaletteOpen(true)} />
