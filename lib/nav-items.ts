@@ -23,13 +23,13 @@ export interface NavItem {
 export const navItems: NavItem[] = [
   { label: "Home", href: "/", icon: Home },
   { label: "Calendar", href: "/calendar", icon: CalendarDays },
+  { label: "Cours", href: "/courses", icon: GraduationCap },
   { label: "Projects", href: "/projects", icon: FolderKanban },
   { label: "Business", href: "/business", icon: Briefcase },
   { label: "Finances", href: "/finances", icon: Wallet },
-  { label: "Goals", href: "/goals", icon: Target },
   { label: "Habits", href: "/habits", icon: Flame },
   { label: "Creative", href: "/creative", icon: Sparkles },
   { label: "Journal", href: "/journal", icon: BookOpen },
-  { label: "Cours", href: "/courses", icon: GraduationCap },
+  { label: "Goals", href: "/goals", icon: Target },
   { label: "Nova AI", href: "/nova", icon: Bot },
 ];

@@ -411,6 +411,16 @@
   .passion .atmosphere-photo {
     background-image: url("/passion-bg.jpg");
   }
+  .passion .cover-mesh-1 {
+    background: radial-gradient(120% 140% at 15% 10%, #c0416d 0%, transparent 55%),
+      radial-gradient(100% 120% at 90% 90%, #0b0d10 0%, transparent 60%),
+      linear-gradient(160deg, #4f1029 0%, #0b0d10 100%);
+  }
+  .passion .cover-mesh-2 {
+    background: radial-gradient(110% 130% at 85% 15%, #f090b3 0%, transparent 55%),
+      radial-gradient(100% 120% at 10% 95%, #0b0d10 0%, transparent 60%),
+      linear-gradient(150deg, #6b1c3f 0%, #0b0d10 100%);
+  }
   .atmosphere-scrim {
     position: absolute;
     inset: 0;
