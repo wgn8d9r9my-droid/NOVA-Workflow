@@ -84,7 +84,7 @@ export function AppShell({ children }: { children: ReactNode }) {
     return (
       <>
         {supabaseConfigured && user && <DataSync />}
-        {theme === "ambiance" && <Atmosphere />}
+        {(theme === "ambiance" || theme === "passion") && <Atmosphere />}
         <div className="min-h-screen" />
       </>
     );

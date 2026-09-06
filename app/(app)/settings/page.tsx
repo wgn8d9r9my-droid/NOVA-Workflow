@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
-import { Check, Sun, Moon, Laptop, Sparkles, Trash2, LogOut } from "lucide-react";
+import { Check, Sun, Moon, Laptop, Sparkles, Heart, Trash2, LogOut } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -19,6 +19,7 @@ const THEME_OPTIONS = [
   { value: "light", label: "Clair", icon: Sun },
   { value: "dark", label: "Sombre", icon: Moon },
   { value: "ambiance", label: "Ambiance", icon: Sparkles },
+  { value: "passion", label: "Passion", icon: Heart },
   { value: "system", label: "Système", icon: Laptop },
 ];
 

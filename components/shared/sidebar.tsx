@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Settings, Plus, Search, ChevronRight, Sun, Moon, Sparkles } from "lucide-react";
+import { Settings, Plus, Search, ChevronRight, Sun, Moon, Sparkles, Heart } from "lucide-react";
 import { motion } from "motion/react";
 import { useTheme } from "next-themes";
 import { cn } from "@/lib/utils";
@@ -27,9 +27,11 @@ export function Sidebar({
   function cycleTheme() {
     if (currentTheme === "light") setTheme("dark");
     else if (currentTheme === "dark") setTheme("ambiance");
+    else if (currentTheme === "ambiance") setTheme("passion");
     else setTheme("light");
   }
-  const ThemeIcon = currentTheme === "dark" ? Moon : currentTheme === "ambiance" ? Sparkles : Sun;
+  const ThemeIcon =
+    currentTheme === "dark" ? Moon : currentTheme === "ambiance" ? Sparkles : currentTheme === "passion" ? Heart : Sun;
 
   return (
     <aside className="fixed inset-y-0 left-0 z-40 hidden w-[92px] flex-col px-3 py-6 lg:flex xl:w-[276px] xl:px-4">
