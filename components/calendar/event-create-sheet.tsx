@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { CalendarIcon, Clock, MapPin, Users, X } from "lucide-react";
@@ -40,6 +40,15 @@ export function EventCreateSheet({
   // separate tasks with two different ids for a single "add" action.
   const submittingRef = useRef(false);
 
+  // Radix only calls onOpenChange in response to its own close requests
+  // (Escape, outside click, etc.) — it never fires when a parent opens the
+  // sheet by flipping the `open` prop, so resetting the guard from inside
+  // handleOpenChange(true) never ran and every "add" after the first one
+  // silently did nothing. Watch the prop directly instead.
+  useEffect(() => {
+    if (open) submittingRef.current = false;
+  }, [open]);
+
   function reset() {
     setTitle("");
     setEventDate(date);
@@ -54,11 +63,7 @@ export function EventCreateSheet({
 
   function handleOpenChange(v: boolean) {
     onOpenChange(v);
-    if (v) {
-      submittingRef.current = false;
-    } else {
-      reset();
-    }
+    if (!v) reset();
   }
 
   function submit() {

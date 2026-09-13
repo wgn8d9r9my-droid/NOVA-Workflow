@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { CheckSquare, StickyNote, Lightbulb, FolderPlus, Receipt, BookOpen } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -41,6 +41,14 @@ export function QuickCapture({
   const [value, setValue] = useState("");
   const [priority, setPriority] = useState<Priority>("P2");
 
+  const addTask = useTasksStore((s) => s.add);
+  const addNote = useNotesStore((s) => s.add);
+  const addProject = useProjectsStore((s) => s.add);
+  // Guards against a double Enter+click firing submit() twice before the
+  // sheet visually closes, which used to create two separate entries for a
+  // single "add" action.
+  const submittingRef = useRef(false);
+
   // Re-sync the selected type from `initialType` each time the sheet opens
   // (adjusting state during render rather than in an effect).
   const [prevOpen, setPrevOpen] = useState(open);
@@ -49,13 +57,14 @@ export function QuickCapture({
     if (open) setType(initialType ?? null);
   }
 
-  const addTask = useTasksStore((s) => s.add);
-  const addNote = useNotesStore((s) => s.add);
-  const addProject = useProjectsStore((s) => s.add);
-  // Guards against a double Enter+click firing submit() twice before the
-  // sheet visually closes, which used to create two separate entries for a
-  // single "add" action.
-  const submittingRef = useRef(false);
+  // Radix only calls onOpenChange in response to its own close requests
+  // (Escape, outside click, etc.) — it never fires when a parent opens the
+  // sheet by flipping the `open` prop, so resetting the guard from
+  // handleOpenChange(true) never ran and every "add" after the first one
+  // silently did nothing. Watch the prop directly instead.
+  useEffect(() => {
+    if (open) submittingRef.current = false;
+  }, [open]);
 
   function reset() {
     setType(initialType ?? null);
@@ -65,11 +74,7 @@ export function QuickCapture({
 
   function handleOpenChange(v: boolean) {
     onOpenChange(v);
-    if (v) {
-      submittingRef.current = false;
-    } else {
-      reset();
-    }
+    if (!v) reset();
   }
 
   function submit() {
