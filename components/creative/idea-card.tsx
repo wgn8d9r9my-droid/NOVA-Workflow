@@ -1,10 +1,12 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { Lightbulb, StickyNote, Trash2, FolderPlus } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 import { useNotesStore } from "@/lib/store/notes";
 import { useProjectsStore } from "@/lib/store/projects";
 import type { Note } from "@/types/entities";
@@ -16,6 +18,25 @@ export function IdeaCard({ note }: { note: Note }) {
   const convertedProject = useProjectsStore((s) =>
     note.converted_to_project_id ? s.items.find((p) => p.id === note.converted_to_project_id) : undefined
   );
+
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState(note.content);
+
+  function startEditing() {
+    setDraft(note.content);
+    setEditing(true);
+  }
+
+  function commit() {
+    setEditing(false);
+    const trimmed = draft.trim();
+    if (trimmed && trimmed !== note.content) updateNote(note.id, { content: trimmed });
+  }
+
+  function cancel() {
+    setEditing(false);
+    setDraft(note.content);
+  }
 
   function convertToProject() {
     const project = addProject({
@@ -47,7 +68,30 @@ export function IdeaCard({ note }: { note: Note }) {
         </button>
       </div>
 
-      <p className="whitespace-pre-wrap text-sm text-foreground/90">{note.content}</p>
+      {editing ? (
+        <Textarea
+          autoFocus
+          value={draft}
+          onChange={(e) => setDraft(e.target.value)}
+          onBlur={commit}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
+              e.currentTarget.blur();
+            } else if (e.key === "Escape") {
+              cancel();
+            }
+          }}
+          rows={3}
+          className="border-none bg-transparent px-0 text-sm text-foreground/90 shadow-none focus-visible:ring-0"
+        />
+      ) : (
+        <p
+          onClick={startEditing}
+          className="cursor-text whitespace-pre-wrap rounded-md text-sm text-foreground/90 transition-colors hover:bg-muted/40"
+        >
+          {note.content}
+        </p>
+      )}
 
       {note.tags.length > 0 && (
         <div className="flex flex-wrap gap-1">
