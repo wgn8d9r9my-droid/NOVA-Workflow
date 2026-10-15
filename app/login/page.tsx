@@ -1,7 +1,7 @@
 "use client";
 
-import { Suspense, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Mail, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,6 +18,7 @@ export default function LoginPage() {
 }
 
 function LoginForm() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
@@ -25,6 +26,17 @@ function LoginForm() {
   const [error, setError] = useState<string | null>(
     searchParams.get("error") ? "Le lien de connexion a expiré ou est invalide. Réessaie." : null
   );
+
+  // A spurious bounce to /login (flaky network on wake-up) must not strand
+  // someone who still has a valid session.
+  useEffect(() => {
+    if (!supabaseConfigured) return;
+    createClient()
+      .auth.getSession()
+      .then(({ data }) => {
+        if (data.session) router.replace("/");
+      });
+  }, [router]);
 
   async function sendMagicLink() {
     if (!email.trim()) return;

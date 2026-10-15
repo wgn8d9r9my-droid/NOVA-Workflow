@@ -45,7 +45,9 @@ export default function SettingsPage() {
 
   async function signOut() {
     const supabase = createClient();
-    await supabase.auth.signOut();
+    // Local scope: the default is global, which would also log out every
+    // other device and shortcut signed in to this account.
+    await supabase.auth.signOut({ scope: "local" });
     router.replace("/login");
   }
 
