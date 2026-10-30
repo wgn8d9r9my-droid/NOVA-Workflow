@@ -13,6 +13,7 @@ import { useTransactionsStore, useClientsStore } from "@/lib/store/finances";
 import { useHabitsStore, useHabitEntriesStore } from "@/lib/store/habits";
 import { useJournalStore } from "@/lib/store/journal";
 import { useSubjectsStore, useCourseNotesStore } from "@/lib/store/courses";
+import { useTodosStore, useTodoListsStore } from "@/lib/store/todos";
 
 const ENTITY_STORES = [
   { table: "tasks", store: useTasksStore },
@@ -29,6 +30,8 @@ const ENTITY_STORES = [
   { table: "journal_entries", store: useJournalStore },
   { table: "subjects", store: useSubjectsStore },
   { table: "course_notes", store: useCourseNotesStore },
+  { table: "todo_lists", store: useTodoListsStore },
+  { table: "todos", store: useTodosStore },
 ] as const;
 
 /** Bootstraps cloud sync once a user is authenticated: pulls + merges remote

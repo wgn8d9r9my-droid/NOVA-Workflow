@@ -9,6 +9,7 @@ import {
   Sparkles,
   BookOpen,
   GraduationCap,
+  ListChecks,
   Bot,
   type LucideIcon,
 } from "lucide-react";
@@ -23,6 +24,7 @@ export interface NavItem {
 export const navItems: NavItem[] = [
   { label: "Home", href: "/", icon: Home },
   { label: "Calendar", href: "/calendar", icon: CalendarDays },
+  { label: "To-do", href: "/todo", icon: ListChecks },
   { label: "Cours", href: "/courses", icon: GraduationCap },
   { label: "Projects", href: "/projects", icon: FolderKanban },
   { label: "Business", href: "/business", icon: Briefcase },

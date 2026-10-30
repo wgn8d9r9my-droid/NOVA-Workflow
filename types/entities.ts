@@ -206,3 +206,34 @@ export interface UserPreferences {
   focus_areas: string[];
   home_widget_order: string[];
 }
+
+export interface TodoList {
+  id: string;
+  name: string;
+  color: string;
+  emoji?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Subtask {
+  id: string;
+  title: string;
+  done: boolean;
+}
+
+export interface TodoItem {
+  id: string;
+  title: string;
+  notes?: string;
+  list_id?: string;
+  priority: Priority;
+  status: TaskStatus;
+  due_date?: string; // yyyy-mm-dd
+  due_time?: string; // HH:mm, 24h
+  color?: string; // overrides the list color
+  subtasks: Subtask[];
+  created_at: string;
+  updated_at: string;
+  completed_at?: string;
+}

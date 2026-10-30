@@ -46,6 +46,13 @@ export async function syncInsert(table: string, entity: object) {
   if (error) reportSyncIssue("ajout", table, error.message);
 }
 
+// JSON.stringify drops keys whose value is undefined, so clearing a field
+// (removing a deadline, a color…) never reached Supabase and the old value
+// came back on the next pull. Send explicit nulls for cleared fields.
+function nullifyUndefined(patch: object) {
+  return Object.fromEntries(Object.entries(patch).map(([k, v]) => [k, v === undefined ? null : v]));
+}
+
 export async function syncUpdate(table: string, id: string, patch: object) {
   const userId = await getUserId();
   if (!userId) {
@@ -53,7 +60,7 @@ export async function syncUpdate(table: string, id: string, patch: object) {
     return;
   }
   const supabase = createClient();
-  const { error } = await supabase.from(table).update(patch).eq("id", id).eq("user_id", userId);
+  const { error } = await supabase.from(table).update(nullifyUndefined(patch)).eq("id", id).eq("user_id", userId);
   if (error) reportSyncIssue("modification", table, error.message);
 }
 
