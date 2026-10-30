@@ -15,6 +15,7 @@ import { IdeasCard } from "@/components/home/ideas-card";
 import { NovaCard } from "@/components/home/nova-card";
 import { AgendaCard } from "@/components/home/agenda-card";
 import { TasksCard } from "@/components/home/tasks-card";
+import { TodoCard } from "@/components/home/todo-card";
 import { QuickActionsCard } from "@/components/home/quick-actions-card";
 import { computeSpotlight, weeklyActivity, weeklyCompletion } from "@/lib/home-intelligence";
 import { projectProgress, goalProgress } from "@/lib/derived";
@@ -158,6 +159,7 @@ export default function HomePage() {
 
       <div className="flex flex-col gap-5">
         <AgendaCard tasks={todaysAgenda} projectName={projectName} projectColor={projectColor} />
+        <TodoCard />
         <TasksCard
           tasks={upcomingTasks.filter((t) => t.status === "todo").slice(0, 6)}
           done={upcomingTasks.filter((t) => t.status === "done").length}
